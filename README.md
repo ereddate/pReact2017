@@ -149,7 +149,7 @@ extend
 
 findNode
   findNode(parent, selector)
-  在父节点下按条件查找，返回数组
+  在父节点下按条件查找，支持多条件查找用空格分开，返回数组
 
 get
   get(url, data, success, error, type, options)
