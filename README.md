@@ -86,3 +86,38 @@ let demo = pReact.createClass("demo", {
   }
 })
 ```
+数据的获取：
+```
+let demo = pReact.createClass("demo", {
+  getInitData(success, error){
+    ajax(url, (data) => {
+      success(data)
+    }, (err) => {
+      error(err)
+    })
+  },
+  render(){
+    let a = document.createDocumentFragment();
+    this._data.data.forEach((n) => {
+       a.appendChild(pReact.tmpl((
+        <div>
+          <span>{{id}}</span>
+        </div>
+       ),n))
+    });
+    return a;
+  }
+});
+或者
+let demo = pReact.createClass("demo", {
+  render(){
+    return (
+      <span>{{name}}</span>
+    )
+  }
+});
+pReact.renderDom(
+  <demo name="a" />,
+  document.body
+)
+```
