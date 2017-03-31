@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="preact.20170215.js"></script>
+		<style>
+			body{background:#f4f5f7;font-family:微软雅黑;}
+			body,ul, p,h1,h2,h3,h4,h5,h6{list-style:none;padding:0;margin:0;}
+		</style>
+	</head>
+	<body>
+		<div id="page"></div>
+		<script>
+			/*!
+			 * pReact & pjs template v1.0.0
+			 * @author yandong
+			 *
+			 * https://github.com/ereddate/pReact
+			 */
+			pReact && ((win, pReact) => {
+				var iscroll = function(elem, options) {
+					return new iscroll.fn.init(elem, options);
+				};
+				iscroll.fn = iscroll.prototype = {
+					init: function(elem, options) {
+						pReact.extend(this, pReact.extend(options, {
+							parent: document.getElementById(elem),
+							content: document.getElementById(options.content),
+							upElem: document.getElementById(options.upElem),
+							downElem: document.getElementById(options.downElem)
+						}));
+						this.topOffset = options.upElemHeight || this.upElem.offsetHeight;
+						this.bottomOffset = options.downElemHeight || this.downElem.offsetHeight;
+						this.maxscroll = this.parent.offsetHeight;
+						this.unit = options.unit || "rem";
+						var that = this;
+						return this;
+					},
+					refresh: function() {
+						//console.log("refresh")
+						this.topOffset = this.upElem.offsetHeight;
+						this.bottomOffset = this.downElem.offsetHeight;
+						this.maxscroll = this.parent.offsetHeight;
+					},
+					done: function(callback) {
+						var that = this;
+						window.onscroll = (e) => {
+							that.scrollFilterCallback && that.scrollFilterCallback(that, function() {
+								var top = this.pageYOffset;
+								if (top + that.maxscroll >= that.parent.scrollHeight) {
+									this.timeout && clearTimeout(this.timeout);
+									this.timeout = setTimeout(function() {
+										that.loadMore && that.loadMore.call(that);
+									}, 1000);
+								}
+							});
+						};
+						that.parent.ontouchstart = function(e) {
+							var touch = e.changedTouches[0];
+							this.pointY = touch.pageY - (this.currentY || 0);
+						};
+						that.parent.ontouchmove = function(e) {
+							var touch = e.changedTouches[0];
+							var deltaY = touch.pageY - this.pointY - that.topOffset;
+							this.currentY = touch.pageY + deltaY + that.topOffset;
+							iscroll.animate(that.content, 0, deltaY, 0, that.unit);
+							this.deltaY = deltaY;
+							that.touchMove && that.touchMove.call(that, deltaY);
+						};
+						that.parent.ontouchend = function(e) {
+							if (this.currentY > 0) {
+								that.touchEnd ? that.touchEnd.call(that, this.deltaY, function() {
+									iscroll.animate(that.content, 0, 0, 0, that.unit);
+								}, function() {
+									iscroll.animate(that.content, 0, "-" + that.topOffset, 0, that.unit);
+								}) : iscroll.animate(that.content, 0, "-" + that.topOffset, 0, that.unit);
+								this.currentY = 0;
+							} else if (this.currentY < this.maxscroll) {
+								iscroll.animate(that.content, 0, this.maxscroll, 0, that.unit);
+							}
+						};
+						callback && callback.call(that);
+						return this;
+					}
+				};
+				iscroll.animate = function(elem, x, y, z, unit) {
+					var fz = screen.width / 16;
+					(typeof elem == "string" ? document.getElementById(elem) : elem)._css({
+						transform: "translate(" + x/fz + unit + ", " + y/fz + unit + ") translateZ(" + z/fz + unit + ")"
+					});
+				};
+				iscroll.fn.init.prototype = iscroll.fn;
+				pReact.scroll = iscroll;
+			})(this, pReact);
+		</script>
+		<script type="text/pReact">
+			let baseFontSize = window.baseFontSize || pReact.getBaseFontSize(),
+			style = pReact.createStyle({
+				clearfix:{
+				    content: ".",
+				    display: "block",
+				    clear: "both",
+				    overflow:"hidden"
+				},
+				fullColumn:{
+					display: "flex",
+					flexFlow: "row"
+				},
+				textCenter:{
+					textAlign:"center"
+				},
+				positionRelative:{
+					position:"relative"
+				},
+				button:{
+					padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+					background: "rgb(255,255,255)",
+					color:"rgb(0,0,0)",
+					fontSize: (16/baseFontSize).toFixed(4)+"rem",
+					border:(1/baseFontSize).toFixed(4)+"rem solid #ccc",
+					borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+					verticalAlign:"middle",
+					minWidth:(70/baseFontSize).toFixed(4)+"rem",
+				},
+				iscroll_main:{
+					zIndex: 1
+				},
+				iscroll_main_context:{
+					marginTop:0,
+					zIndex: 1,
+					transform: "translate(0, -"+(77.64/baseFontSize).toFixed(4)+"rem) translateZ(0)",
+					"-webkit-tap-highlight-color": "rgba(0, 0, 0, 0)"
+				},
+				iscroll_main_context_ul:{
+					listStyle: "none",
+					padding: 0,
+					margin: 0,
+					width: "100%",
+					textAlign: "left"
+				},
+				iscroll_main_context_li:{
+					fontSize: (16/baseFontSize).toFixed(4)+"rem",
+					padding: (10/baseFontSize).toFixed(4)+"rem",
+					borderBottom: (1/baseFontSize).toFixed(4)+"rem solid rgb(220,220,220)",
+					borderTop: (1/baseFontSize).toFixed(4)+"rem solid #fff",
+					backgroundColor: "#fafafa"
+				},
+				iscroll_main_context_li_shop:{
+					padding:(5/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_refresh:{
+					fontSize: (14/baseFontSize).toFixed(4)+"rem",
+					background:"rgb(0,191,255)",
+					color:"rgb(0,0,0)",
+					textAlign:"center",
+					border:0
+				},
+				pullDown:{
+					height: (77.64/baseFontSize).toFixed(4)+"rem",
+					lineHeight: (77.64/baseFontSize).toFixed(4)+"rem",
+					fontWeight: "bold",
+					fontSize: (16/baseFontSize).toFixed(4)+"rem",
+					color: "#888",
+					textAlign: "center",
+					display: "block",
+					position: "relative"
+				},
+				iscroll_main_context_li_item_left:{
+					background:"rgb(220,220,220)",
+					float:"left",
+					display:"inline-block",
+					width: (128/baseFontSize).toFixed(4)+"rem",
+					height: (92/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_li_item_img:{
+					width: (128/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_li_item_shop_img:{
+					width: "100%",
+					textAlign:"center",
+					borderBottom:(1/baseFontSize).toFixed(4)+"rem solid #ccc"
+				},
+				iscroll_main_context_li_item_img_custom:{
+					float:"left",
+					width:(100/3).toFixed(4)+"%",
+					padding:(10/baseFontSize).toFixed(4)+"rem 0"
+				},
+				iscroll_main_context_li_item_right:{
+					float:"left",
+					marginRight:(10/baseFontSize).toFixed(4)+"rem",
+					width: ((screen.width-160)/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_li_item_right_b:{
+					float:"left",
+					marginLeft:(10/baseFontSize).toFixed(4)+"rem",
+					width: ((screen.width-160)/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_li_item_title:{
+					textDecoration:"none",
+					color:"rgb(0,0,0)",
+					fontSize:(20/baseFontSize).toFixed(4)+"rem",
+					fontWeight:400
+				},
+				iscroll_main_context_li_item_shop_title:{
+					height:(26/baseFontSize).toFixed(4)+"rem",
+					overflow:"hidden"
+				},
+				iscroll_main_context_li_item_aside:{
+					fontSize:(12/baseFontSize).toFixed(4)+"rem",
+					color:"rgb(169,169,169)"
+				},
+				iscroll_main_context_li_item_shop_aside:{
+					height:(18/baseFontSize).toFixed(4)+"rem",
+					overflow:"hidden"
+				},
+				iscroll_main_context_li_item_video:{
+					background: "rgb(0,0,0)",
+					width: "100%",
+					height:(200/baseFontSize).toFixed(4)+"rem",
+					margin: "0 auto",
+					textAlign: "center"
+				},
+				iscroll_main_context_li_item_shop_price:{
+					color:"rgb(255,96,0)",
+					fontSize:(26/baseFontSize).toFixed(4)+"rem",
+					paddingBottom: (10/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_li_item_shop_unit:{
+					fontSize:(12/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_li_item_shopgroup:{
+					float:"left",
+					width: (100/2).toFixed(4)+"%",
+					overflow:"hidden",
+					margin: (5/baseFontSize).toFixed(4)+"rem 0",
+				},
+				iscroll_main_context_li_item_shop_buybutton:{
+					background:"rgb(255,87,34)",
+					color: "rgb(255,255,255)",
+					border:0,
+					marginRight:(5/baseFontSize).toFixed(4)+"rem"
+				},
+				iscroll_main_context_li_item_shop_icon_new:{
+					position:"absolute",
+					top:0,
+					left:0,
+					background:"rgb(154,205,50)",
+					color:"rgb(255,255,255)",
+					fontSize:(10/baseFontSize).toFixed(4)+"rem",
+					fontStyle:"normal",
+					padding:"0 "+(10/baseFontSize).toFixed(4)+"rem",
+					borderBottomRightRadius:(5/baseFontSize).toFixed(4)+"rem"
+				}
+			});
+			let scrollView = pReact.createClass("scrollView", {
+				render(){
+					return (
+						<div style={styles.iscroll_main} id="wrapper">
+							<div style={styles.iscroll_main_context} id="scroller">
+								<span id="pullDown" style={styles.pullDown}>下拉刷新</span>
+								<ul style={styles.iscroll_main_context_ul} id="scrollerView">
+								</ul>
+								<span id="pullUp" style={styles.pullDown}>正在加载...</span>
+							</div>
+						</div>
+					)
+				}
+			}),
+			scrollViewList = pReact.createClass("scrollViewList", {
+				getInitData(success, error){
+					success({
+						data: [{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40 "+(1000*Math.random(1000)).toFixed(2),
+							type: "video",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img1: "https://minimg.hexun.com/i8.hexun.com/2015-05-11/175706935_c162x117.jpg",
+							img2: "https://minimg.hexun.com/i8.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							img3: "https://minimg.hexun.com/i8.hexun.com/2017-02-20/188214325_c162x117.jpg",
+							type: "picgroup",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40 "+(1000*Math.random(1000)).toFixed(2),
+							type: "video",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							shops:[{
+								title: "智能摄像机AABBCC",
+								desc: "随时看护家的温暖与安全",
+								url: "",
+								img: "https://i8.mifile.cn/v1/a1/85a78a1a-ff71-dab4-8e7d-8119dfce798b.webp?width=360&height=360",
+								source: "外网商城",
+								price: 22.22
+							},{
+								title: "支架式自拍杆AABBCC",
+								desc: "随时看护家的温暖与安全",
+								url: "",
+								img: "https://i8.mifile.cn/v1/a1/9f575eab-237d-d341-c69d-b212b01117e7.webp?width=360&height=360",
+								source: "外网商城",
+								price: 22.22
+							},{
+								title: "支架式自拍杆AABBCC",
+								desc: "随时看护家的温暖与安全",
+								url: "",
+								img: "https://i8.mifile.cn/v1/a1/9f575eab-237d-d341-c69d-b212b01117e7.webp?width=360&height=360",
+								source: "外网商城",
+								price: 22.22
+							},{
+								title: "智能摄像机AABBCC",
+								desc: "随时看护家的温暖与安全",
+								url: "",
+								img: "https://i8.mifile.cn/v1/a1/85a78a1a-ff71-dab4-8e7d-8119dfce798b.webp?width=360&height=360",
+								source: "外网商城",
+								price: 22.22
+							},{
+								title: "智能摄像机AABBCC",
+								desc: "随时看护家的温暖与安全",
+								url: "",
+								img: "https://i8.mifile.cn/v1/a1/85a78a1a-ff71-dab4-8e7d-8119dfce798b.webp?width=360&height=360",
+								source: "外网商城",
+								price: 22.22
+							},{
+								title: "支架式自拍杆AABBCC",
+								desc: "随时看护家的温暖与安全",
+								url: "",
+								img: "https://i8.mifile.cn/v1/a1/9f575eab-237d-d341-c69d-b212b01117e7.webp?width=360&height=360",
+								source: "外网商城",
+								price: 22.22
+							}],
+							type: "shop"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40 "+(1000*Math.random(1000)).toFixed(2),
+							type: "video",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img1: "https://minimg.hexun.com/i8.hexun.com/2015-05-11/175706935_c162x117.jpg",
+							img2: "https://minimg.hexun.com/i8.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							img3: "https://minimg.hexun.com/i8.hexun.com/2017-02-20/188214325_c162x117.jpg",
+							type: "picgroup",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40 "+(1000*Math.random(1000)).toFixed(2),
+							type: "video",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40 "+(1000*Math.random(1000)).toFixed(2),
+							type: "video",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img1: "https://minimg.hexun.com/i8.hexun.com/2015-05-11/175706935_c162x117.jpg",
+							img2: "https://minimg.hexun.com/i8.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							img3: "https://minimg.hexun.com/i8.hexun.com/2017-02-20/188214325_c162x117.jpg",
+							type: "picgroup",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							type: "news",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40 "+(1000*Math.random(1000)).toFixed(2),
+							type: "video",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						}]
+					})
+				},
+				handleClick(e){
+					console.log(e);
+					let url = this._attr("data-href");
+					location.href = url;
+				},
+				handleVideoClick(e){
+					console.log(e)
+				},
+				handleBuyClick(e){
+					console.log(e)
+				},
+				handleColClick(e){
+					console.log(e)
+				},
+				render(){
+					let a = pReact.createDom("docmentfragment", {}), i=0, then = this;
+					this._data.data && this._data.data.forEach((n) => {
+						i+=1;
+						a._append(parseInt(then._data.pagenum) > 0 && i === 1 ? pReact.tmpl((
+							<li style={styles.iscroll_main_context_li}{styles.iscroll_main_context_refresh} id="clickRefresh">上次看到这里，点击刷新列表</li>
+						),n) : n.type == "video" ? pReact.tmpl((
+							<li style={styles.iscroll_main_context_li}{styles.clearfix}>
+								<video data-src="{{video}}" style={styles.iscroll_main_context_li_item_video} onclick={handleVideoClick} data-poster="{{img}}"></video>
+								<div>
+									<h2 style={styles.iscroll_main_context_li_item_title}>{{title}}</h2>
+									<p style={styles.iscroll_main_context_li_item_aside}>{{source}} {{time}}</p>
+								</div>
+							</li>
+						),n) : n.type == "picgroup" ? pReact.tmpl((
+							<li style={styles.iscroll_main_context_li}{styles.clearfix} onclick={handleClick} data-href="{{url}}">
+								<h2 style={styles.iscroll_main_context_li_item_title}>{{title}}</h2>
+								<div style={styles.fullColumn}{styles.clearfix}>
+									<span><img data-src="{{img1}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.iscroll_main_context_li_item_img_custom} /></span>
+									<span><img data-src="{{img2}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.iscroll_main_context_li_item_img_custom} /></span>
+									<span><img data-src="{{img3}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.iscroll_main_context_li_item_img_custom} /></span>
+								</div>
+								<p style={styles.iscroll_main_context_li_item_aside}>{{source}} {{time}}</p>
+							</li>
+						),n) : n.type == "shop" ? (pReact.tmpl((
+							<li style={styles.iscroll_main_context_li}{styles.clearfix}{styles.iscroll_main_context_li_shop} id="shopgroup">
+							</li>
+						),n))._findNode("#shopgroup")[0]._append(((e) => {
+							n.shops.forEach((b) => {
+								e.appendChild(pReact.tmpl((
+									<div style={styles.iscroll_main_context_li_item_shopgroup}{styles.positionRelative}>
+										<i style={styles.iscroll_main_context_li_item_shop_icon_new}>新品</i>
+										<a href="{{url}}" style={styles.clearfix}{styles.textCenter}>
+											<img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.iscroll_main_context_li_item_img}{styles.iscroll_main_context_li_item_shop_img} />
+										</a>
+										<h2 style={styles.iscroll_main_context_li_item_title}{styles.iscroll_main_context_li_item_shop_title}>{{title}}</h2>
+										<p style={styles.iscroll_main_context_li_item_aside}{styles.iscroll_main_context_li_item_shop_aside}>
+											<span>{{desc}}<span>-<span>{{source}}</span>
+										</p>
+										<p style={styles.iscroll_main_context_li_item_shop_price}>
+											<label style={styles.iscroll_main_context_li_item_shop_unit}>￥</label><span>{{price}}</span>
+										</p>
+										<button style={styles.button}{styles.iscroll_main_context_li_item_shop_buybutton} onclick={handleBuyClick}>购买</button><button style={styles.button} onclick={handleColClick}>收藏</button>
+									</div>
+								), b))
+							});
+							return e;
+						})) : i%2 === 0 ? pReact.tmpl((
+							<li style={styles.iscroll_main_context_li}{styles.clearfix} onclick={handleClick} data-href="{{url}}">
+								<div style={styles.iscroll_main_context_li_item_right}>
+									<h2 style={styles.iscroll_main_context_li_item_title}>{{title}}</h2>
+									<p style={styles.iscroll_main_context_li_item_aside}>{{source}} {{time}}</p>
+								</div>
+								<div style={styles.iscroll_main_context_li_item_left}><img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.iscroll_main_context_li_item_img} /></div>
+							</li>
+						),n) : pReact.tmpl((
+							<li style={styles.iscroll_main_context_li}{styles.clearfix} onclick={handleClick} data-href="{{url}}">
+								<div style={styles.iscroll_main_context_li_item_left}><img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.iscroll_main_context_li_item_img} /></div>
+								<div style={styles.iscroll_main_context_li_item_right_b}>
+									<h2 style={styles.iscroll_main_context_li_item_title}>{{title}}</h2>
+									<p style={styles.iscroll_main_context_li_item_aside}>{{source}} {{time}}</p>
+								</div>
+							</li>
+						),n));
+					});
+					return a;
+				}
+			});
+			pReact.renderDom(
+				<scrollView />,
+				document.getElementById("page"),
+				(() => {
+					pReact.renderDom(
+						<scrollViewList pageNum="0" />,
+						document.getElementById("scrollerView"),
+						(() => {
+							pReact.scroll("wrapper", {
+								content: "scroller",
+								upElem: "pullDown",
+								downElem: "pullUp",
+								scrollFilterCallback: function(that, done){
+									done();
+								},
+								refreshData: function(loading, loaded) {
+									this.upElem.innerHTML = "正在加载...";
+									loading();
+									let dom = document.getElementById("scrollerView");
+									dom._empty();
+									pReact.renderDom(
+										<scrollViewList pageNum="0" />,
+										dom,
+										(() => {
+											setTimeout(function() {
+												loaded();
+											}, 1000);
+										})
+									);
+									this.loadMoreCount = 0;
+									this.downElem.innerHTML = "正在加载...";
+								},
+								touchMove: function(y) {
+									if (y >= 50) {
+										this.upElem.innerHTML = "松开刷新";
+									} else {
+										this.upElem.innerHTML = "下拉刷新";
+									}
+								},
+								touchEnd: function(y, loading, loaded) {
+									if (y >= 50) {
+										this.refreshData(loading, loaded);
+									} else {
+										this.upElem.innerHTML = "下拉刷新";
+										loaded();
+									}
+								},
+								loadMore: function() {
+									let that = this;
+									Object.is(this.loadMoreCount, undefined) && (this.loadMoreCount = 0);
+									this.loadMoreCount+=1;
+									if (this.loadMoreCount<=5){
+										let refresh = document.getElementById("clickRefresh");
+										refresh && refresh._remove();
+										pReact.renderDom(
+											<scrollViewList pageNum="1" />,
+											document.getElementById("scrollerView"),
+											(() => {
+												setTimeout(function(){
+													let refresh = document.getElementById("clickRefresh");
+													refresh && (refresh.onclick = (e) => {
+														that.clickRefresh.call(that, refresh, e);
+													});
+												}, 1000);
+											})
+										);
+									}else{
+										this.downElem.innerHTML = "已经到底";
+									}
+								},
+								clickRefresh: function(element, e){
+									let that = this;
+									element.parentNode.removeChild(element);
+									window.scrollTo(0,0);
+									that.upElem.innerHTML = "正在加载...";
+									pReact.scroll.animate(that.content, 0, 0, 0, that.unit);
+									let dom = document.getElementById("scrollerView");
+									dom._empty();
+									pReact.renderDom(
+										<scrollViewList pageNum="0" />,
+										dom,
+										(() => {
+											setTimeout(function(){
+												pReact.scroll.animate(that.content, 0, "-"+that.topOffset, 0, that.unit);
+												that.upElem.innerHTML = "下拉刷新";
+												let refresh = document.getElementById("clickRefresh");
+												refresh && (refresh.onclick = (e) => {
+													that.clickRefresh.call(that, refresh, e);
+												});
+											}, 1000);
+										})
+									);
+									that.loadMoreCount = 0;
+									that.downElem.innerHTML = "正在加载...";
+								}
+							}).done(function() {
+								var that = this,
+									refresh = document.getElementById("clickRefresh");
+								refresh && (refresh.onclick = (e) => {
+									that.clickRefresh.call(that, refresh, e);
+								});
+							});
+						})
+					);
+				})
+			)
+		</script>
+	</body>
+</html>

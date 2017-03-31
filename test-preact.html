@@ -1,0 +1,2819 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="preact.20170215.js"></script>
+		<style>
+			body {
+				background: #f4f5f7;
+				font-family: 微软雅黑;
+			}
+			body, ul, p {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+			.item {
+				display: block;
+				clear: both;
+			}
+			.page_loading {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.5);
+				z-index: 99999;
+			}
+			.page_loading .spinner {
+				margin: 75% auto 0 auto;
+				width: 6.25em;
+				height: 2.75em;
+				text-align: center;
+				font-size: 0.625em;
+			}
+			@media (height:480px) {
+				.page_loading .spinner {
+					margin-top: 60%;
+				}
+			}
+			.page_loading .spinner div {
+				background-color: #ffffff;
+				height: 100%;
+				width: 0.3125em;
+				display: inline-block;
+				-webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+				animation: stretchdelay 1.2s infinite ease-in-out;
+				margin: 0 0.125em;
+			}
+			.page_loading .spinner .rect2 {
+				-webkit-animation-delay: -1.1s;
+				animation-delay: -1.1s;
+			}
+			.page_loading .spinner .rect3 {
+				-webkit-animation-delay: -1s;
+				animation-delay: -1s;
+			}
+			.page_loading .spinner .rect4 {
+				-webkit-animation-delay: -0.9s;
+				animation-delay: -0.9s;
+			}
+			.page_loading .spinner .rect5 {
+				-webkit-animation-delay: -0.8s;
+				animation-delay: -0.8s;
+			}
+			.page_loading .spinner .rect6 {
+				-webkit-animation-delay: -0.8s;
+				animation-delay: -0.7s;
+			}
+			.page_loading .spinner .rect7 {
+				-webkit-animation-delay: -0.8s;
+				animation-delay: -0.6s;
+			}
+			.page_loading .spinner .rect8 {
+				-webkit-animation-delay: -0.8s;
+				animation-delay: -0.5s;
+			}
+			.page_loading .spinner .rect9 {
+				-webkit-animation-delay: -0.8s;
+				animation-delay: -0.4s;
+			}
+			.page_loading .spinner .rect10 {
+				-webkit-animation-delay: -0.8s;
+				animation-delay: -0.3s;
+			}
+			@-webkit-keyframes stretchdelay {
+				0%, 40%, 100% {
+					-webkit-transform: scaleY(0.4);
+				}
+				20% {
+					-webkit-transform: scaleY(1);
+				}
+			}
+			@keyframes stretchdelay {
+				0%, 40%, 100% {
+					transform: scaleY(0.4);
+					-webkit-transform: scaleY(0.4);
+				}
+				20% {
+					transform: scaleY(1);
+					-webkit-transform: scaleY(1);
+				}
+			}
+			.loader,
+			.loader:before,
+			.loader:after {
+			  border-radius: 50%;
+			}
+			.loader {
+			  color: #0dc5c1;
+			  font-size: 3px;
+			  text-indent: -99999em;
+			  margin: 75% auto;
+			  position: relative;
+			  width: 10em;
+			  height: 10em;
+			  box-shadow: inset 0 0 0 1em;
+			  -webkit-transform: translateZ(0);
+			  -ms-transform: translateZ(0);
+			  transform: translateZ(0);
+			}
+			.loader:before,
+			.loader:after {
+			  position: absolute;
+			  content: '';
+			}
+			.loader:before {
+			  width: 5.2em;
+			  height: 10.2em;
+			  background: rgba(0,0,0,1);
+			  border-radius: 10.2em 0 0 10.2em;
+			  top: -0.1em;
+			  left: -0.1em;
+			  -webkit-transform-origin: 5.2em 5.1em;
+			  transform-origin: 5.2em 5.1em;
+			  -webkit-animation: load2 2s infinite ease 1.5s;
+			  animation: load2 2s infinite ease 1.5s;
+			}
+			.loader:after {
+			  width: 5.2em;
+			  height: 10.2em;
+			  background: rgba(0,0,0,1);
+			  border-radius: 0 10.2em 10.2em 0;
+			  top: -0.1em;
+			  left: 5.1em;
+			  -webkit-transform-origin: 0px 5.1em;
+			  transform-origin: 0px 5.1em;
+			  -webkit-animation: load2 2s infinite ease;
+			  animation: load2 2s infinite ease;
+			}
+			@-webkit-keyframes load2 {
+			  0% {
+			    -webkit-transform: rotate(0deg);
+			    transform: rotate(0deg);
+			  }
+			  100% {
+			    -webkit-transform: rotate(360deg);
+			    transform: rotate(360deg);
+			  }
+			}
+			@keyframes load2 {
+			  0% {
+			    -webkit-transform: rotate(0deg);
+			    transform: rotate(0deg);
+			  }
+			  100% {
+			    -webkit-transform: rotate(360deg);
+			    transform: rotate(360deg);
+			  }
+			}
+		</style>
+	</head>
+	<body>
+		<div id="page"></div>
+		<script>
+			//pReact.toAmp();
+		</script>
+		<script type="text/pReact">
+			'use strict';
+			pReact.import("css/preact.font.css").then((status) => {
+				console.log(status)
+			}, (status) => {
+				console.log(status)
+			}).catch((error) => {
+				console.log(error)
+			});
+			var baseFontSize = baseFontSize || pReact.getBaseFontSize(),
+				styles = pReact.createStyle({
+					clearfix:{
+					    content: ".",
+					    display: "block",
+					    clear: "both",
+					    overflow:"hidden"
+					},
+					hide:{
+						display:"none"
+					},
+					show:{
+						display: "block"
+					},
+					red:{
+						color:"red"
+					},
+					fullColumn:{
+						display: "flex",
+						flexFlow: "row"
+					},
+					twoColumnItem:{
+						width:  (100/2).toFixed(2)+"%",
+						float: "left"
+					},
+					threeColumnItem:{
+						width:  (100/3).toFixed(2)+"%",
+						float: "left"
+					},
+					button:{
+						padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						background: "rgb(255,255,255)",
+						color:"rgb(0,0,0)",
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid #ccc",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						verticalAlign:"middle",
+						minWidth:(70/baseFontSize).toFixed(4)+"rem",
+					},
+					marginSpanRight:{
+						marginRight: (5/baseFontSize).toFixed(4)+"rem"
+					},
+					marginSpanLeft:{
+						marginLeft: (5/baseFontSize).toFixed(4)+"rem"
+					},
+					buttonActive:{
+						background: "rgb(51,122,183)",
+						color:"rgb(255,255,255)"
+					},
+					position:{
+						position:"absolute",
+						top:0,
+						left:0,
+						right:0
+					},
+					pageview:{
+						minHeight:(screen.height/baseFontSize).toFixed(4)+"rem"
+					},
+					dropdown:{
+						display:"inline-block",
+						position:"relative",
+						lineHeight: (20/baseFontSize).toFixed(4)+"rem",
+						margin:"0 "+(5/baseFontSize).toFixed(4)+"rem"
+					},
+					dropdownButton:{
+						padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid #ccc",
+						background: "rgb(255,255,255)",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem",
+						width: (150/baseFontSize).toFixed(4)+"rem"
+					},
+					dropbuttonList:{
+					    position: "absolute",
+					    clear: "left",
+					    left: 0,
+					    zIndex: 999998,
+						padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid #ccc",
+						background: "rgb(255,255,255)",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					dropbuttonListdown:{
+					    top: "100%",
+					    marginTop:(5/baseFontSize).toFixed(4)+"rem"
+					},
+					dropbuttonListup:{
+					    top: "auto",
+					    bottom: "100%",
+					    marginBottom: (5/baseFontSize).toFixed(4)+"rem"
+					},
+					dropbuttonListItem:{
+						textDecoration:"none",
+						display:"inline-block",
+						padding:(6/baseFontSize).toFixed(4)+"rem 0",
+						color:"rgb(0,0,0)",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					header: {
+						margin:0,
+						background: "rgba(220,220,220,.8)",
+						position: "fixed",
+						top:0,
+						left:0,
+						right:0,
+						height:(50/baseFontSize).toFixed(4)+"rem",
+						zIndex:999999
+					},
+					menu: {
+						listStyle:"none",
+						position: "absolute",
+						top:(50/baseFontSize).toFixed(4)+"rem",
+						left:0,
+						width: "100%",
+						margin:0,
+						padding:0
+					},
+					showMenu:{
+						listStyle:"none",
+						position: "absolute",
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						top:(50/baseFontSize).toFixed(4)+"rem",
+						left:0,
+						width: "100%",
+						margin:0,
+						padding:0,
+						display:"block",
+						height: (120/baseFontSize).toFixed(4)+"rem",
+						overflow: "scroll"
+					},
+					showMenuButton: {
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						position: "absolute",
+						top:(10/baseFontSize).toFixed(4)+"rem",
+						right:(10/baseFontSize).toFixed(4)+"rem"
+					},
+					logo:{
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						display: "block",
+						lineHeight: (50/baseFontSize).toFixed(4)+"rem",
+						marginLeft: (10/baseFontSize).toFixed(4)+"rem"
+					},
+					menuButton:{
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						lineHeight: (30/baseFontSize).toFixed(4)+"rem",
+						padding: "0 "+(12/baseFontSize).toFixed(4)+"rem",
+						display: "block",
+						background: "rgba(128,128,128,1)",
+						color: "rgb(255,255,255)",
+						textDecoration: "none"
+					},
+					headerTop:{
+						marginTop: (50/baseFontSize).toFixed(4)+"rem"
+					},
+					tools:{
+						marginTop: (10/baseFontSize).toFixed(4)+"rem",
+						background: "rgb(255,255,255)",
+						padding:(6/baseFontSize).toFixed(4)+"rem 0"
+					},
+					search:{
+						textAlign: "center",
+						height: (40/baseFontSize).toFixed(4)+"rem",
+						background: "rgb(255,255,255)"
+					},
+					searchInput:{
+						width:((screen.width-44)/baseFontSize).toFixed(4)+"rem",
+						margin: "0 "+(10/baseFontSize).toFixed(4)+"rem",
+						border: (1/baseFontSize).toFixed(4)+"rem solid rgb(169,169,169)",
+						fontSize: (14/baseFontSize).toFixed(4)+"rem",
+						borderRadius: (10/baseFontSize).toFixed(4)+"rem",
+						padding: (2/baseFontSize).toFixed(4)+"rem "+(10/baseFontSize).toFixed(4)+"rem"
+					},
+					quota:{
+						marginTop: (10/baseFontSize).toFixed(4)+"rem",
+						position: "relative"
+					},
+					quotaUl:{
+						width:"100%"
+					},
+					quotaInitColor:{
+						backgroundColor: "#4eb559",
+						color: "rgb(255,255,255)",
+						textAlign: "center",
+						fontSize: (14/baseFontSize).toFixed(4)+"rem",
+						padding: (10/baseFontSize).toFixed(4)+"rem 0",
+						lineHeight: (25/baseFontSize).toFixed(4)+"rem"
+					},
+					quotaRiseColor:{
+						backgroundColor: "#f93735"
+					},
+					newsChannelItem:{
+						float:"left"
+					},
+					newsChannel:{
+						display:"block",
+						clear: "both",
+						padding: "0 0 "+(10/baseFontSize).toFixed(4)+"rem 0",
+						overflow: "hidden",
+						fontSize: (14/baseFontSize).toFixed(4)+"rem"
+					},
+					channelActive:{
+						color: "red",
+						textDecoration: "none",
+						margin: "0 "+(10/baseFontSize).toFixed(4)+"rem 0 0"
+					},
+					channelTitle:{
+						textDecoration: "none",
+						color: "rgb(0,0,0)",
+						margin: "0 "+(10/baseFontSize).toFixed(4)+"rem"
+					},
+					newsList:{
+						display:"block",
+						clear: "both"
+					},
+					newsListItem:{
+						margin:"0 0 "+(10/baseFontSize).toFixed(4)+"rem 0",
+						clear:"both",
+						overflow: "hidden"
+					},
+					newsListActive:{
+						color: "red",
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						textDecoration: "none",
+						lineHeight: (30/baseFontSize).toFixed(4)+"rem",
+						display:"block"
+					},
+					newsListItemSource:{
+						color: "rgb(130,130,130)",
+						fontSize: (10/baseFontSize).toFixed(4)+"rem",
+						lineHeight: (26/baseFontSize).toFixed(4)+"rem",
+					},
+					newsListItemTitle:{
+						color: "rgb(0,0,0)",
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						textDecoration: "none",
+						lineHeight: (26/baseFontSize).toFixed(4)+"rem",
+						display:"block"
+					},
+					viewItem: {
+						display:"block",
+						clear: "both",
+						background: "rgb(255,255,255)",
+						marginTop:(10/baseFontSize).toFixed(4)+"rem",
+						padding: (10/baseFontSize).toFixed(4)+"rem"
+					},
+					footer:{
+						height: (180/baseFontSize).toFixed(4)+"rem",
+						textAlign: "center",
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						background: "rgba(218,60,60,1)",
+						overflow:"hidden",
+						color: "rgb(255,255,255)",
+						marginTop: (10/baseFontSize).toFixed(4)+"rem"
+					},
+					footerMenu:{
+						margin: (20/baseFontSize).toFixed(4)+"rem"
+					},
+					footerMenuItem:{
+						textDecoration: "none",
+						color: "rgb(255,255,255)",
+						margin: "0 "+(5/baseFontSize).toFixed(4)+"rem"
+					},
+					footerButton:{
+						width: (140/baseFontSize).toFixed(4)+"rem",
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						borderRadius: (10/baseFontSize).toFixed(4)+"rem",
+						border: 0,
+						background: "rgb(255,255,255)",
+						lineHeight: (40/baseFontSize).toFixed(4)+"rem"
+					},
+					copyright:{
+						clear: "both",
+						display: "block",
+						fontSize: (14/baseFontSize).toFixed(4)+"rem",
+						marginTop: (20/baseFontSize).toFixed(4)+"rem"
+					},
+					adTongLan:{
+						width:"100%",
+						height: (64/baseFontSize).toFixed(4)+"rem",
+						textAlign: "center",
+						marginTop: (10/baseFontSize).toFixed(4)+"rem",
+						background: "rgb(105,105,105)"
+					},
+					adTongLanItem:{
+						lineHeight: (64/baseFontSize).toFixed(4)+"rem"
+					},
+					gotop:{
+						position:"fixed",
+						bottom:(60/baseFontSize).toFixed(4)+"rem",
+						right:(20/baseFontSize).toFixed(4)+"rem",
+						background: "rgba(105,105,105, .5)",
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						borderRadius: (100/baseFontSize).toFixed(4)+"rem",
+						width: (40/baseFontSize).toFixed(4)+"rem",
+						height: (40/baseFontSize).toFixed(4)+"rem",
+						textAlign: "center",
+						lineHeight: (40/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(255,255,255)",
+						textDecoration:"none",
+						zIndex:999998
+					},
+					left:{
+						float:"left",
+						width: (128/baseFontSize).toFixed(4)+"rem"
+					},
+					right:{
+						float:"left",
+						marginLeft:(10/baseFontSize).toFixed(4)+"rem",
+						width: ((screen.width-160)/baseFontSize).toFixed(4)+"rem"
+					},
+					photosListItem:{
+						width:(100/2-3).toFixed(2)+"%",
+						height: (124/baseFontSize).toFixed(4)+"rem",
+						float: "left",
+						textAlign: "center",
+						padding:(5/baseFontSize).toFixed(4)+"rem",
+						position:"relative"
+					},
+					photosListItemTitle:{
+						background:"rgba(0,0,0,.6)",
+						color:"rgb(255,255,255)",
+						margin:"0 "+(5/baseFontSize).toFixed(4)+"rem",
+						padding: (5/baseFontSize).toFixed(4)+"rem",
+						textAlign:"left",
+						fontSize:(14/baseFontSize).toFixed(4)+"rem",
+						position:"absolute",
+						bottom:0,
+						left:0,
+						right:0
+					},
+					photosListItemLlink:{
+						display:"block"
+					},
+					photosListItemImg:{
+						width:"100%"
+					},
+					photosList:{
+						padding:"0 0 " +(10/baseFontSize).toFixed(4)+"rem 0",
+						overflow:"hidden"
+					},
+					modulebox:{
+						position:"fixed",
+						top:0,
+						left:0,
+						right:0,
+						bottom:0,
+						textAlign:"center",
+						background:"rgba(255,255,255,.7)",
+						color:"rgb(255,255,255)",
+						zIndex:999999,
+						display:"block"
+					},
+					androidloading:{
+						background:"rgba(0,0,0,1)"
+					},
+					moduleboxView:{
+						position:"fixed",
+						top:"45%",
+						left:(20/baseFontSize).toFixed(4)+"rem",
+						right:(20/baseFontSize).toFixed(4)+"rem",
+						textAlign:"center",
+						background:"rgba(0,0,0,1)",
+						padding:(10/baseFontSize).toFixed(4)+"rem",
+						borderRadius:(10/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(255,255,255)",
+						fontSize:(20/baseFontSize).toFixed(4)+"rem"
+					},
+					moduleboxBlock:{
+						background:"rgba(0,0,0,.7)"
+					},
+					moduleboxViewModule:{
+						top:"30%"
+					},
+					moduleboxViewFullscreen:{
+						top:(5/baseFontSize).toFixed(4)+"rem",
+						left:(5/baseFontSize).toFixed(4)+"rem",
+						right:(5/baseFontSize).toFixed(4)+"rem",
+						bottom:(5/baseFontSize).toFixed(4)+"rem",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						background: "rgb(255,255,255)",
+						color:"rgb(0,0,0)"
+					},
+					moduleboxViewImgView:{
+						padding:0,
+						top:0,
+						left:0,
+						right:0,
+						bottom:0,
+						borderRadius:0,
+						background:"rgb(0,0,0)",
+						color:"rgb(255,255,255)"
+					},
+					moduleboxViewBottom:{
+						position:"fixed",
+						left:(5/baseFontSize).toFixed(4)+"rem",
+						right:(5/baseFontSize).toFixed(4)+"rem",
+						bottom:(5/baseFontSize).toFixed(4)+"rem",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						textAlign:"center",
+						background:"rgba(0,0,0,1)",
+						padding:(10/baseFontSize).toFixed(4)+"rem",
+						borderRadius:(10/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(255,255,255)",
+						fontSize:(20/baseFontSize).toFixed(4)+"rem"
+					},
+					moduleboxViewTop:{
+						position:"fixed",
+						left:0,
+						right:0,
+						top:0,
+						borderRadius:0,
+						textAlign:"center",
+						background:"rgba(0,0,0,1)",
+						padding:(10/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(255,255,255)",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					moduleboxCloseButton:{
+						background:"rgb(0,0,0)",
+						color:"rgb(255,255,255)",
+						top:0,
+						right:0,
+						position:"absolute",
+						borderTopRightRadius:(5/baseFontSize).toFixed(4)+"rem",
+						padding:"0 "+(10/baseFontSize).toFixed(4)+"rem"
+					},
+					moduleboxViewModuleTitle:{
+
+					},
+					moduleboxViewModuleContent:{
+						height: (200/baseFontSize).toFixed(4)+"rem",
+						overflow: "auto",
+						overflowX: "hidden",
+						textAlign: "left"
+					},
+					moduleboxViewModuleContentFull:{
+						marginTop:(20/baseFontSize).toFixed(4)+"rem",
+						height: ((screen.height-50)/baseFontSize).toFixed(4)+"rem",
+					},
+					moduleboxViewModuleContentImgView:{
+						marginTop:(30/baseFontSize).toFixed(4)+"rem",
+						overflow: "visible",
+						overflowX: "",
+					},
+					moduleboxViewModuleContentBottom:{
+						marginTop:(20/baseFontSize).toFixed(4)+"rem",
+						height: (60/baseFontSize).toFixed(4)+"rem",
+					},
+					moduleboxViewModuleControl:{
+						textAlign:"center"
+					},
+					moduleboxButton:{
+						background:"rgb(169,169,169)",
+						border:0,
+						borderRadius:(10/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(255,255,255)",
+						margin: "0 "+(10/baseFontSize).toFixed(4)+"rem",
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						padding:(5/baseFontSize).toFixed(4)+"rem "+(10/baseFontSize).toFixed(4)+"rem"
+					},
+					moduleboxButtonActive:{
+						background:"rgb(218,60,60)",
+					},
+					moduleboxWarn:{
+						top:(5/baseFontSize).toFixed(4)+"rem",
+						left:(5/baseFontSize).toFixed(4)+"rem",
+						right:(5/baseFontSize).toFixed(4)+"rem",
+						background:"rgba(242,222,222,.8)",
+						color:"rgb(169,68,66)",
+						border:(1/baseFontSize).toFixed(4)+"rem solid rgb(242,222,222)",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						textAlign: "left"
+					},
+					moduleboxCloseX:{
+						position:"absolute",
+						top:(10/baseFontSize).toFixed(4)+"rem",
+						right:(10/baseFontSize).toFixed(4)+"rem",
+						fontStyle:"normal",
+						fontSize:(10/baseFontSize).toFixed(4)+"rem"
+					},
+					a:{
+						color:"rgb(0,0,0)"
+					},
+					refreshContent:{
+						position:"absolute",
+						top:0,
+						right:0,
+						fontSize:(14/baseFontSize).toFixed(4)+"rem"
+					},
+					video:{
+						background: "rgb(0,0,0)",
+						width: "100%",
+						height:(200/baseFontSize).toFixed(4)+"rem",
+						margin: "0 auto",
+						textAlign: "center"
+					},
+					tab:{
+						marginTop:(10/baseFontSize).toFixed(4)+"rem",
+						padding:(5/baseFontSize).toFixed(4)+"rem",
+						background:"rgb(255,255,255)"
+					},
+					tabButtonControl:{
+
+					},
+					tabButton:{
+						margin:(5/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(0,0,0)",
+						textAlign:"center",
+						fontSize:(14/baseFontSize).toFixed(4)+"rem",
+						padding:(5/baseFontSize).toFixed(4)+"rem 0"
+					},
+					tabButtonActive:{
+						display:"inline-block",
+						background:"rgb(51,122,183)",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(255,255,255)"
+					},
+					tabView:{
+						fontSize:(14/baseFontSize).toFixed(4)+"rem",
+						borderTop:(1/baseFontSize).toFixed(4)+"rem solid rgb(220,220,220)",
+						padding:(5/baseFontSize).toFixed(4)+"rem 0"
+					},
+					tabButtonTip:{
+						background:"rgb(169,169,169)",
+						color:"rgb(255,255,255)",
+						borderRadius:(10/baseFontSize).toFixed(4)+"rem",
+						fontStyle:"normal",
+						marginLeft:(5/baseFontSize).toFixed(4)+"rem",
+						padding:"0 "+(5/baseFontSize).toFixed(4)+"rem",
+						display:"inline-block",
+						fontSize:(14/baseFontSize).toFixed(4)+"rem"
+					},
+					buttonGroup:{
+						textAlign:"center",
+						display:"inline-block",
+						verticalAlign: "middle",
+						margin:(5/baseFontSize).toFixed(4)+"rem 0",
+						padding:0
+					},
+					buttonGroupButton:{
+						border: (1/baseFontSize).toFixed(4)+"rem solid rgb(220,220,220)",
+						borderRight:0,
+						background: "rgb(255,255,255)",
+						padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						fontSize:(14/baseFontSize).toFixed(4)+"rem",
+						float:"left"
+					},
+					buttonGroupButtonActive:{
+						background: "rgb(51,122,183)",
+						color:"rgb(255,255,255)"
+					},
+					buttonGroupButtonFirst:{
+						borderTopLeftRadius:(5/baseFontSize).toFixed(4)+"rem",
+						borderBottomLeftRadius:(5/baseFontSize).toFixed(4)+"rem"
+					},
+					buttonGroupButtonLast:{
+						borderTopRightRadius:(5/baseFontSize).toFixed(4)+"rem",
+						borderBottomRightRadius:(5/baseFontSize).toFixed(4)+"rem",
+						borderRight:(1/baseFontSize).toFixed(4)+"rem solid rgb(220,220,220)"
+					},
+					listView:{
+						margin:"0 "+(10/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid rgb(220,220,220)",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						padding:(10/baseFontSize).toFixed(4)+"rem",
+						background:"rgb(255,255,255)",
+						clear:"both"
+					},
+					listviewitem:{
+						borderBottom:(1/baseFontSize).toFixed(4)+"rem solid rgb(220,220,220)",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem",
+						padding: (6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						clear:"both"
+					},
+					listviewitemlast:{
+						border:0
+					},
+					listviewitemtitle:{
+						display:"inline-block",
+						verticalAlign: "middle",
+						lineHeight:(30/baseFontSize).toFixed(4)+"rem",
+						width:"90%",
+						position:"relative",
+						zIndex:2
+					},
+					listviewitemicon:{
+						display:"inline-block",
+						verticalAlign: "middle",
+						fontSize:(12/baseFontSize).toFixed(4)+"rem",
+						fontStyle:"normal",
+						textAlign:"right",
+						width:"10%",
+						fontWeight:700,
+						position:"relative",
+						zIndex:2
+					},
+					listviewitem_mark:{
+						position:"relative"
+					},
+					listviewitemmark:{
+						background:"rgb(245, 245, 245)",
+						minWidth:"8%",
+						display:"block",
+						height: (42/baseFontSize).toFixed(4)+"rem",
+						position:"absolute",
+						top:0,
+						left:0,
+						bottom:0,
+						zIndex:1
+					},
+					progress:{
+						padding:(5/baseFontSize).toFixed(4)+"rem",
+						overflow:"hidden",
+						background:"rgb(255,255,255)"
+					},
+					progressView:{
+						background:"rgb(245, 245, 245)",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						boxShadow:"inset 0 "+(1/baseFontSize).toFixed(4)+"rem "+(2/baseFontSize).toFixed(4)+"rem rgba(0,0,0,.1)",
+						overflow:"hidden"
+					},
+					progressload:{
+						background:"rgb(51,122,183)",
+						textAlign:"center",
+						fontSize:(14/baseFontSize).toFixed(4)+"rem",
+						color:"rgb(255,255,255)",
+						display:"block",
+						overflow:"hidden",
+						minWidth:"8%"
+					},
+					topbanner:{
+						overflow:"hidden",
+						width:(screen.width/baseFontSize).toFixed(4)+"rem",
+						height:(screen.width/1.9714/baseFontSize).toFixed(4)+"rem"
+					},
+					topbannerItems:{
+						width:(screen.width*3/baseFontSize).toFixed(4)+"rem",
+						display:"block",
+						transform: "translate3d(0px, 0px, 0px)",
+						transitionDuration:"0.5s"
+					},
+					topbannerItem:{
+						float:"left",
+						width:(screen.width/baseFontSize).toFixed(4)+"rem",
+						height:(screen.width/1.9714/baseFontSize).toFixed(4)+"rem",
+						position:"relative"
+					},
+					topbannerItemLink:{
+						display:"block"
+					},
+					topbannerItemImg:{
+						width:"100%"
+					},
+					topbannerItemAside:{
+						padding:(10/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem",
+						background:"rgba(0,0,0,.5)",
+						color:"rgb(255,255,255)",
+						position:"absolute",
+						bottom:0,
+						left:0,
+						right:0
+					},
+					topbannerItemAsideTitle:{
+						padding:0,
+						margin:0,
+						fontSize:(16/baseFontSize).toFixed(4)+"rem",
+						fontWeight:400
+					},
+					topbannerItemAsideDesc:{
+						fontSize:(12/baseFontSize).toFixed(4)+"rem"
+					},
+					topbannerItemCount:{
+						position:"absolute",
+						top:(10/baseFontSize).toFixed(4)+"rem",
+						right:(10/baseFontSize).toFixed(4)+"rem"
+					},
+					topbannerItemCountNum:{
+						fontStyle:"normal"
+					},
+					xform:{
+						fontSize:(16/baseFontSize).toFixed(4)+"rem",
+						background:"rgb(255,255,255)",
+						marginTop:(10/baseFontSize).toFixed(4)+"rem",
+						padding:(10/baseFontSize).toFixed(4)+"rem"
+					},
+					xGroup:{
+						padding:(5/baseFontSize).toFixed(4)+"rem 0",
+						margin:(5/baseFontSize).toFixed(4)+"rem 0"
+					},
+					xinput:{
+					},
+					xinputTitle:{
+						display:"block",
+						lineHeight:(30/baseFontSize).toFixed(4)+"rem"
+					},
+					xinputInput:{
+						padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid rgb(204,204,204)",
+						borderRadius:(6/baseFontSize).toFixed(4)+"rem",
+						boxShadow:"inset 0 "+(1/baseFontSize).toFixed(4)+"rem "+(1/baseFontSize).toFixed(4)+"rem rgba(0, 0, 0, 0.075)",
+						transition: "border-color ease-in-out .15s, box-shadow ease-in-out .15s",
+						width:((screen.width-50)/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					xinputInputAuto:{
+						width:(100/baseFontSize).toFixed(4)+"rem"
+					},
+					xinputInputRange:{
+						boxShadow:"inset 0 0",
+						border:0,
+						borderRadius:0,
+					},
+					xradio:{
+						padding:(5/baseFontSize).toFixed(4)+"rem 0",
+						margin:0
+					},
+					xradioInput:{
+						marginRight:(10/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					xcheck:{
+						padding:(5/baseFontSize).toFixed(4)+"rem 0",
+						margin:0
+					},
+					xcheckInput:{
+						marginRight:(10/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					xtextarea:{
+
+					},
+					xtextareaTitle:{
+						display:"block",
+						lineHeight:(30/baseFontSize).toFixed(4)+"rem"
+					},
+					xtextareaInput:{
+						padding:(6/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid rgb(204,204,204)",
+						borderRadius:(6/baseFontSize).toFixed(4)+"rem",
+						boxShadow:"inset 0 "+(1/baseFontSize).toFixed(4)+"rem "+(1/baseFontSize).toFixed(4)+"rem rgba(0, 0, 0, 0.075)",
+						transition: "border-color ease-in-out .15s, box-shadow ease-in-out .15s",
+						minHeight:(100/baseFontSize).toFixed(4)+"rem",
+						width:((screen.width-40)/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					xtextareaTip:{
+						color:"rgb(204,204,204)",
+						fontSize:(14/baseFontSize).toFixed(4)+"rem"
+					},
+					xselect:{
+
+					},
+					xselectTitle:{
+						display:"block",
+						lineHeight:(30/baseFontSize).toFixed(4)+"rem"
+					},
+					xselectView:{
+						border:(1/baseFontSize).toFixed(4)+"rem solid rgb(204,204,204)",
+						borderRadius:(6/baseFontSize).toFixed(4)+"rem",
+						boxShadow:"inset 0 "+(1/baseFontSize).toFixed(4)+"rem "+(1/baseFontSize).toFixed(4)+"rem rgba(0, 0, 0, 0.075)",
+						transition: "border-color ease-in-out .15s, box-shadow ease-in-out .15s",
+						width:((screen.width-26)/baseFontSize).toFixed(4)+"rem",
+						height:(30/baseFontSize).toFixed(4)+"rem",
+						position:"relative"
+					},
+					xselectTip:{
+						position:"absolute",
+						top:(10/baseFontSize).toFixed(4)+"rem",
+						right:(12/baseFontSize).toFixed(4)+"rem",
+						fontSize:(10/baseFontSize).toFixed(4)+"rem",
+						lineHeight:(16/baseFontSize).toFixed(4)+"rem"
+					},
+					xselectInput:{
+						position:"absolute",
+						top:0,
+						left:0,
+						right:0,
+						bottom:0,
+						"-webkit-appearance":"none",
+						padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						border:0,
+						borderRadius:(6/baseFontSize).toFixed(4)+"rem",
+						fontSize:(16/baseFontSize).toFixed(4)+"rem",
+						zIndex:1
+					},
+					xselectInputHidden:{
+						width:((screen.width - 26)/baseFontSize).toFixed(4)+"rem",
+						zIndex:2
+					},
+					xbutton:{
+						padding:(6/baseFontSize).toFixed(4)+"rem "+(12/baseFontSize).toFixed(4)+"rem",
+						background: "rgb(255,255,255)",
+						color:"rgb(0,0,0)",
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid #ccc",
+						borderRadius:(5/baseFontSize).toFixed(4)+"rem",
+						verticalAlign:"middle",
+						minWidth:(70/baseFontSize).toFixed(4)+"rem",
+						display:"inline-block"
+					},
+					xbuttonActive:{
+						background:"rgb(51,122,183)",
+						color:"rgb(255,255,255)"
+					},
+					xnav:{
+						fontSize: (20/baseFontSize).toFixed(4)+"rem",
+						height:(50/baseFontSize).toFixed(4)+"rem",
+						lineHeight:(50/baseFontSize).toFixed(4)+"rem",
+						textAlign:"left",
+						background:"rgb(244,245,247)"
+					},
+					xnavTitle:{
+						lineHeight:(50/baseFontSize).toFixed(4)+"rem",
+						display:"block",
+						padding:"0 0 0 "+(10/baseFontSize).toFixed(4)+"rem",
+						width:(100/baseFontSize).toFixed(4)+"rem"
+					},
+					xnav_viewTitle:{
+						width:(65/baseFontSize).toFixed(4)+"rem"
+					},
+					xnavMenu:{
+						width:((screen.width-137)/baseFontSize).toFixed(4)+"rem",
+						textAlign:"right",
+						overflow:"hidden",
+						position:"relative"
+					},
+					xnavMenuMain:{
+						width:((screen.width-137)/baseFontSize).toFixed(4)+"rem",
+						padding:"0 "+(10/baseFontSize).toFixed(4)+"rem",
+						overflow:"scroll",
+						overflowY:"hidden",
+					},
+					xnavMenuLeftShadow:{
+						display:"block",
+						position:"absolute",
+						left:0,
+						top:0,
+						width:(10/baseFontSize).toFixed(4)+"rem",
+						height:"100%",
+						background:"-webkit-linear-gradient(left,rgb(244,245,247),hsla(0,0%,100%,.2))",
+					},
+					xnavMenuRightShadow:{
+						display:"block",
+						position:"absolute",
+						right:0,
+						top:0,
+						width:(10/baseFontSize).toFixed(4)+"rem",
+						height:"100%",
+						background:"-webkit-linear-gradient(left,hsla(0,0%,100%,.2),rgb(244,245,247))",
+					},
+					xnavMore:{
+						lineHeight:(50/baseFontSize).toFixed(4)+"rem",
+						width:(37/baseFontSize).toFixed(4)+"rem",
+						display:"block",
+					    backgroundSize: (16/baseFontSize).toFixed(4)+"rem",
+					    backgroundPosition: (10/baseFontSize).toFixed(4)+"rem center",
+					    backgroundRepeat: "no-repeat",
+						textAlign:"center",
+						position:"relative"
+					},
+					xnavmoreList:{
+						position:"absolute",
+						lineHeight:(16/baseFontSize).toFixed(4)+"rem",
+						textAlign:"left",
+						top:"100%",
+						right: (2/baseFontSize).toFixed(4)+"rem",
+						background:"rgb(255,255,255)",
+						zIndex:999,
+						minWidth:(150/baseFontSize).toFixed(4)+"rem",
+						border:(1/baseFontSize).toFixed(4)+"rem solid #ccc",
+						borderBottom:0
+					},
+					xnavmoreListItem:{
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						display:"block",
+						lineHeight:(35/baseFontSize).toFixed(4)+"rem",
+						textDecoration:"none",
+						color:"#000",
+						borderBottom:(1/baseFontSize).toFixed(4)+"rem solid #ccc",
+						textIndent:(10/baseFontSize).toFixed(4)+"rem"
+					},
+					xnavmenuList:{
+						display:"block"
+					},
+					xnavmenuListItem:{
+						fontSize: (16/baseFontSize).toFixed(4)+"rem",
+						textDecoration:"none",
+						color:"#000",
+						float:"left",
+						marginRight:(10/baseFontSize).toFixed(4)+"rem"
+					},
+					newsView:{
+						position:"fixed",
+						top:0,
+						left:0,
+						right:0,
+						bottom:0,
+						background:"rgba(255,255,255,1)",
+						zIndex:999999
+					},
+					newsViewMainIframe:{
+						border:0,
+						width:(screen.width/baseFontSize).toFixed(4)+"rem",
+						height:((document.documentElement.clientHeight)/baseFontSize).toFixed(4)+"rem"
+					}
+				}),
+				tools = pReact.createClass("tools", {
+					render(){
+						return (
+							<div style={styles.tools}{styles.fullColumn} id="toolsmain">
+							</div>
+						)
+					}
+				}),
+				dropButtonList = pReact.createClass("dropButtonList", {
+					getInitData(success, error){
+						success([{
+							title: "Action",
+							num: "99+"
+						},{
+							title: "Another action",
+							num: "0"
+						},{
+							title: "Separated link",
+							num: "20"
+						}])
+					},
+					handleClick(e){
+						console.log(e)
+					},
+					render(){
+						var b = document.createDocumentFragment(), i=0;
+						this._data && this._data.data.forEach((n) => {
+							i+=1;
+							b.appendChild(pReact.tmpl((
+								<li>
+									<a href="javascript:;" style={styles.dropbuttonListItem} onclick={handleClick}>{{title}}</a>
+								</li>
+							),n))
+						});
+						return b;
+					}
+				}),
+				dropButton = pReact.createClass("dropbutton", {
+					handleClick(e){
+						let p = this.parentNode._findNode("ul")[0], type =this._attr("data-type");
+						if (/none/.test(p.style.display))
+							p._empty()._set({
+								style: [styles.show,styles.dropbuttonList, styles["dropbuttonList"+type]].join(';')
+							});
+						else
+							p._empty()._set({
+								style: [styles.hide,styles.dropbuttonList, styles["dropbuttonList"+type]].join(';')
+							});
+						pReact.renderDom(
+							<dropButtonList />,
+							document.getElementById("drop"+type)
+						)
+					},
+					render(){
+						let a = this._data && this._data.type == "down" ? pReact.tmpl((
+							<div style={styles.dropdown}>
+								<button style={styles.dropdownButton} onclick={handleClick} data-type="{{type}}">
+									{{title}}
+								</button>
+								<ul id="dropdown" style={styles.hide}{styles.dropbuttonList}{styles.dropbuttonListdown}>
+								</ul>
+							</div>
+						), this._data) : pReact.tmpl((
+							<div style={styles.dropdown}{styles.dropup}>
+								<button style={styles.dropdownButton}{styles.dropupButton} onclick={handleClick} data-type="{{type}}">
+									{{title}}
+								</button>
+								<ul id="dropup" style={styles.hide}{styles.dropbuttonList}{styles.dropbuttonListup}>
+								</ul>
+							</div>
+						), this._data);
+						return a;
+					}
+				}),
+				header = pReact.createClass("header", {
+					menuItemClick(e){
+						console.log(e)
+					},
+					showMenuClick(e){
+						let next = this._next(),
+							isShow = next._has(next.style.display, "none");
+						next._set({
+							style: isShow ? styles.showMenu : [styles.menu,styles.hide].join(';')
+						});
+						this._set({
+							text: isShow ? "close" : "menu"
+						});
+					},
+					render(){
+						return (
+							<div style={styles.header} class="header">
+								<span style={styles.logo}>logo</span>
+								<span style={styles.showMenuButton} onclick={showMenuClick}>menu</span>
+								<menu style={styles.hide}{styles.menu}>
+									<li>
+										<a href="javascript:;" style={styles.menuButton} onclick={menuItemClick}>test</a>
+									</li>
+									<li>
+										<a href="javascript:;" style={styles.menuButton} onclick={menuItemClick}>test2</a>
+									</li>
+									<li>
+										<a href="javascript:;" style={styles.menuButton} onclick={menuItemClick}>test3</a>
+									</li>
+									<li>
+										<a href="javascript:;" style={styles.menuButton} onclick={menuItemClick}>test4</a>
+									</li>
+									<li>
+										<a href="javascript:;" style={styles.menuButton} onclick={menuItemClick}>test5</a>
+									</li>
+								</menu>
+							</div>
+						);
+					}
+				}),
+				tab = pReact.createClass("tab", {
+					handleClick(e){
+						var p =this.parentNode._findNode("span"), then = this,i=-1, lis = this.parentNode._next()._findNode("li");
+						p.forEach((e) => {
+							i+=1;
+							let b = Object.is(e,then);
+							e._set({
+								style: (b ? [styles.tabButton,styles.threeColumnItem, styles.tabButtonActive] : [styles.tabButton,styles.threeColumnItem]).join(';')
+							});
+							lis[i]._set({
+								style: (b ? [styles.tabView,styles.show] : [styles.tabView,styles.hide]).join(';')
+							})
+						});
+					},
+					handleAddTipCountClick(e){
+						!this.tipCount && (this.tipCount=0);
+						let button = this._parents(".tab").firstChild._findNode("span")[1],
+							tip = button._findNode("i")._eq(0);
+						if (tip) tip._remove();
+						this.tipCount+=1;
+						button._append(pReact.tmpl((
+							<i style={styles.tabButtonTip}>{{num}}</i>
+						), {
+							num:this.tipCount>99 ? "99+" : this.tipCount
+						}))
+					},
+					render(){
+						return (
+							<div style={styles.tab} class="tab">
+								<div style={styles.tabButtonControl}{styles.fullColumn}>
+									<span style={styles.tabButton}{styles.threeColumnItem}{styles.tabButtonActive} onclick={handleClick}>1<i style={styles.tabButtonTip}>99+</i></span>
+									<span style={styles.tabButton}{styles.threeColumnItem} onclick={handleClick}>2</span>
+									<span style={styles.tabButton}{styles.threeColumnItem} onclick={handleClick}>3<i style={styles.tabButtonTip}>99+</i></span>
+								</div>
+								<ul>
+									<li style={styles.tabView}{styles.show}>
+										<button onclick={handleAddTipCountClick}>增加提示</button>
+									</li>
+									<li style={styles.tabView}{styles.hide}>2
+									</li>
+									<li style={styles.tabView}{styles.hide}>3
+									</li>
+								</ul>
+							</div>
+						)
+					}
+				}),
+				quotali = pReact.createClass("quotali", {
+					getInitData(success, error){
+						success([{
+							quotaValue: (1000 * Math.random(1000)).toFixed(2),
+							quotaName: "上证指数",
+							quotaRate: Math.random(1000).toFixed(2),
+							url: ""
+						},{
+							quotaValue: (1000 * Math.random(1000)).toFixed(2),
+							quotaName: "上证指数",
+							quotaRate: Math.random(1000).toFixed(2),
+							url: ""
+						},{
+							quotaValue: (1000 * Math.random(1000)).toFixed(2),
+							quotaName: "上证指数",
+							quotaRate: Math.random(1000).toFixed(2),
+							url: ""
+						}])
+					},
+					handleClick(e){
+						let url = this.getAttribute("data-url");
+						location.href = url;
+					},
+					render(){
+						var b = document.createDocumentFragment(), i=0;
+						this._data && this._data.data.forEach((n) => {
+							i+=1;
+							b.appendChild(i%2 === 1 ? pReact.tmpl((
+								<li style={styles.threeColumnItem}{styles.quotaInitColor} onclick={handleClick} data-url="{{url}}">
+									{{quotaValue}}<i></i>
+									<p>{{quotaName}} {{quotaRate}}%</p>
+								</li>
+							), n) : pReact.tmpl((
+								<li style={styles.threeColumnItem}{styles.quotaInitColor}{styles.quotaRiseColor} onclick={handleClick} data-url="{{url}}">
+									{{quotaValue}}<i></i>
+									<p>{{quotaName}} {{quotaRate}}%</p>
+								</li>
+							), n))
+						});
+						return b
+					}
+				}),
+				quota = pReact.createClass("quota", {
+					handleClick(e){
+						pReact.renderDom(quotali, {}, this.parentNode._findNode("#quotalist")[0]._empty());
+					},
+					render(){
+						return (
+							<div style={styles.fullColumn}{styles.quota} class="quotamain">
+								<span style={styles.refreshContent} onclick={handleClick}>换一换</span>
+								<ul style={styles.quotaUl} id="quotalist"></ul>
+							</div>
+						)
+					}
+				}),
+				xvideo = pReact.createClass("xvideo", {
+					handleVideoClick(e){
+
+					},
+					render(){
+						return (
+							<div>
+								<video data-src="{{src}}" style={styles.video} onclick={handleVideoClick} data-poster="{{poster}}"></video>
+							</div>
+						)
+					}
+				}),
+				newsChannel = pReact.createClass("newsChannel", {
+					render(){
+						var b = document.createDocumentFragment(), i=0;
+						[{
+							title: "新闻",
+							url: ""
+						},{
+							title: "新闻",
+							url: ""
+						},{
+							title: "新闻",
+							url: ""
+						},{
+							title: "新闻",
+							url: ""
+						}].forEach((n) => {
+							i+=1;
+							b.appendChild(i=== 1 ? pReact.tmpl((
+								<li style={styles.newsChannelItem}>
+									<a href="{{url}}" style={styles.channelActive}>{{title}}</a> <span class="line">|</span>
+								</li>
+							), n) : i>3 ? pReact.tmpl((
+								<li style={styles.newsChannelItem}>
+									<a href="{{url}}" style={styles.channelTitle}>{{title}}</a>
+								</li>
+							), n) : pReact.tmpl((
+								<li style={styles.newsChannelItem}>
+									<a href="{{url}}" style={styles.channelTitle}>{{title}}</a> <span class="line">|</span>
+								</li>
+							), n))
+						});
+						return b
+					}
+				}),
+				newsView = pReact.createClass("newsView", {
+					render(){
+						return (
+							<div style={styles.newsView}>
+								<xnav menuid="xnav_view_menuview" moreid="xnav_view_moreview" type="view"></xnav>
+								<div style={styles.newsViewMain} id="{{id}}">
+								</div>
+							</div>
+						)
+					}
+				}),
+				newsList = pReact.createClass("newsList", {
+					getInitData(success, error){
+						setTimeout(() => {
+						success([{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i8.hexun.com/2015-05-11/175706935_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i6.hexun.com/2017-02-21/188228660_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i8.hexun.com/2015-05-11/175706935_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i9.hexun.com/2017-02-20/188214325_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40",
+							video: "http://vdata.tool.hexun.com/2017-01-03/187591064_m.mp4"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i0.hexun.com/2014-10-10/169190461_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40"
+						},{
+							title: "证监会发布监管问答 定增基金发行数量或锐减",
+							url: "",
+							img: "https://minimg.hexun.com/i8.hexun.com/2015-05-11/175706935_c162x117.jpg",
+							source: "证券时报",
+							time: "02-21 02:40"
+						}])
+						}, 50)
+					},
+					handleVideoClick(e){
+						this.paused ? this.play() : this.pause();
+					},
+					handleVideoTitleClick(e){
+						e.preventDefault();
+						let then = this;
+						pReact.renderDom(
+							<newsView id="newview_iframe" style={styles.position} />,
+							document.body,
+							(() => {
+								pReact.findNode("#xnav_view_menuview")[0].innerHTML = then._text();
+								let elem = pReact.tmpl((
+									<div>
+										<iframe src="{{url}}" style={styles.newsViewMainIframe}{styles.headerTop}></iframe>
+									</div>
+								),{
+									url:"http://m.hexun.com/news/2017-03-24/188615120.html"
+								}),
+								parent = pReact.findNode("#newview_iframe")[0];
+								parent._append(elem);
+								pReact.findNode(window)[0]._on("resize", function(e){
+									parent._findNode("iframe")[0].style.height = ((document.documentElement.clientHeight)/baseFontSize).toFixed(4)+"rem"
+								});
+							})
+						);
+						console.log(e)
+					},
+					handleNewsTitleClick(e){
+						e.preventDefault();
+						console.log(e)
+					},
+					render(){
+						var b = document.createDocumentFragment(), i=0;
+						this._data && this._data.data.forEach((n) => {
+							i+=1;
+							b.appendChild(i=== 1 ? n.video ? pReact.tmpl((
+								<li style={styles.newsListItem}>
+									<div>
+										<xvideo src="{{video}}" poster="{{img}}"></xvideo>
+									</div>
+									<div>
+										<a href="{{url}}" style={styles.newsListActive} onclick={handleVideoTitleClick}>{{title}}</a>
+										<p style={styles.newsListItemSource}>{{source}} {{time}}</p>
+										<button type="button" style={styles.button}{styles.buttonActive}{styles.marginSpanRight}>点赞</button><button type="button" style={styles.button}>下载</button>
+									</div>
+								</li>
+							), n) : pReact.tmpl((
+								<li style={styles.newsListItem}>
+									<img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.left} />
+									<div style={styles.right}>
+										<a href="{{url}}" style={styles.newsListActive} onclick={handleNewsTitleClick}>{{title}}</a>
+										<p style={styles.newsListItemSource}>{{source}} {{time}}</p>
+									</div>
+								</li>
+							), n) : n.video ? pReact.tmpl((
+								<li style={styles.newsListItem}>
+									<video data-src="{{video}}" style={styles.video} onclick={handleVideoClick} data-poster="{{img}}"></video>
+									<div>
+										<a href="{{url}}" style={styles.newsListItemTitle} onclick={handleVideoTitleClick}>{{title}}</a>
+										<p style={styles.newsListItemSource}>{{source}} {{time}}</p>
+									</div>
+								</li>
+							), n) : pReact.tmpl((
+								<li style={styles.newsListItem}>
+									<img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.left} />
+									<div style={styles.right}>
+										<a href="{{url}}" style={styles.newsListItemTitle} onclick={handleNewsTitleClick}>{{title}}</a>
+										<p style={styles.newsListItemSource}>{{source}} {{time}}</p>
+									</div>
+								</li>
+							), n))
+						});
+						return b
+					}
+				}),
+				news = pReact.createClass("news", {
+					render(){
+						return (
+							<div style={styles.viewItem}>
+								<ul style={styles.newsChannel}>
+									<newschannel></newschannel>
+								</ul>
+								<div style={styles.newsList} id="{{id}}"></div>
+							</div>
+						);
+					}
+				}),
+				progress = pReact.createClass("progress", {
+					render(){
+						this._data = this._data && pReact.extend(this._data, {
+							style: styles.progressload
+						}) || {
+							style: styles.progressload
+						};
+						let a = pReact.tmpl((
+							<div style={styles.progress}>
+								<div style={styles.progressView}>
+									<span style={styles.progressload} data-style="width:{{value}};">{{value}}</span>
+								</div>
+							</div>
+						), this._data);
+						return a;
+					}
+				}),
+				footermenu = pReact.createClass("footermenu", {
+					render(){
+						var b = document.createDocumentFragment(), i=0;
+						[{
+							title: "menuitem",
+							url:""
+						},{
+							title: "menuitem",
+							url:""
+						},{
+							title: "menuitem",
+							url:""
+						}].forEach((n) => {
+							i+=1;
+							b.appendChild(pReact.tmpl((
+								<a href="{{url}}" style={styles.footerMenuItem}>{{title}}</a>
+							),n));
+						});
+						return b;
+					}
+				}),
+				footer = pReact.createClass("footer", {
+					render(){
+						return pReact.tmpl((
+							<div style={styles.footer}>
+								<p style={styles.footerMenu}>{footermenu.render}</p>
+								<button style={styles.footerButton}>{{buttonTitle}}</button>
+								<span style={styles.copyright}>Copyright&copy;{{copyright}}</span>
+							</div>
+						), {buttonTitle: "opinion", copyright: "pReact."});
+					}
+				}),
+				adTongLan = pReact.createClass("adTongLan",{
+					render(){
+						return (
+							<div style={styles.adTongLan}>
+								<span style={styles.adTongLanItem}>ad_tonglan</span>
+							</div>
+						)
+					}
+				}),
+				adTwoLan = pReact.createClass("adTongLan",{
+					render(){
+						return (
+							<div style={styles.fullColumn}{styles.adTongLan}>
+								<span style={styles.twoColumnItem}>ad_tonglan</span><span style={styles.twoColumnItem}>ad_tonglan</span>
+							</div>
+						)
+					}
+				}),
+				goTop = pReact.createClass("goTop", {
+					handleClick(e){
+						window.scrollTo(1,1)
+					},
+					render(){
+						return (
+							<a href="javascript:;" onclick={handleClick} style={styles.gotop}>top</a>
+						);
+					}
+				}),
+				search = pReact.createClass("search", {
+					handleKeyUp(e){
+						console.log(this.value);
+					},
+					handleKeyDown(e){
+						console.log(e);
+						if (!/[a-zA-Z0-9]/.test(e.key)){
+							e.preventDefault();
+							return false;
+						}
+					},
+					render(){
+						return (
+							<div style={styles.search}>
+								<input type="text" value="" placeholder="{{defaultText}}" style={styles.searchInput} onkeyup={handleKeyUp} onkeydown={handleKeyDown} />
+							</div>
+						)
+					}
+				}),
+				photosList = pReact.createClass("photosList", {
+					getInitData(success, error){
+						setTimeout(() => {
+							success([{
+								title: "组图：“中国防务”亮相阿布扎比国际防务展",
+								img: "https://minimg.hexun.com/g0.hexun.com/2017-02-21/188231238_c166x118.jpg",
+								url:""
+							},{
+								title: "组图：“中国防务”亮相阿布扎比国际防务展",
+								img: "https://minimg.hexun.com/g0.hexun.com/2017-02-21/188231238_c166x118.jpg",
+								url:""
+							},{
+								title: "组图：“中国防务”亮相阿布扎比国际防务展",
+								img: "https://minimg.hexun.com/g0.hexun.com/2017-02-21/188231238_c166x118.jpg",
+								url:""
+							},{
+								title: "组图：“中国防务”亮相阿布扎比国际防务展",
+								img: "https://minimg.hexun.com/g0.hexun.com/2017-02-21/188231238_c166x118.jpg",
+								url:""
+							}])
+						}, 2000)
+					},
+					handleClick(e){
+						pReact.renderDom(
+							<moduleBox type="androidloading" />,
+							document.body,
+							(() => {
+								setTimeout(() => {
+									document.getElementById("modulebox")._remove();
+									pReact.renderDom(
+										<moduleBox type="imgview" />,
+										document.body,
+										(() => {
+											pReact.renderDom(
+												<horizontalbanner id="imgviewmain" />,
+												document.getElementById("moduleboxmain"),
+												(() => {
+													pReact.renderDom(
+														<topbanner_list />,
+														document.getElementById("imgviewmain"),
+														(() => {
+															let a = pReact.findNode("#moduleboxmain")[0];
+															a._findNode("img").forEach((b) => {
+																b._one("load", (e) => {
+																	console.log("loaded");
+																	let c = pReact.findNode("#imgviewmain")[0];
+																	c && a._css("marginTop", ((screen.height - c.parentNode._height())/2/baseFontSize).toFixed(4)+"rem");
+																});
+															});
+														})
+													)
+												})
+											)
+										})
+									)
+								}, 5000)
+							})
+						)
+					},
+					render(){
+						var b = document.createDocumentFragment(), i=0;
+						this._data && this._data.data.forEach((n) => {
+							i+=1;
+							b.appendChild(pReact.tmpl((
+								<div style={styles.photosListItem}>
+									<a href="javascript:;" style={styles.photosListItemLlink} onclick={handleClick}>
+										<img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.photosListItemImg}/>
+									</a>
+									<p style={styles.photosListItemTitle}>{{title | limitTo : 5}}</p>
+								</div>
+							),n));
+						});
+						return b;
+					}
+				}),
+				photos = pReact.createClass("photos", {
+					render(){
+						return (
+							<div style={styles.viewItem}>
+								<ul style={styles.newsChannel}>
+									<newschannel></newschannel>
+								</ul>
+								<div style={styles.photosList} id="{{id}}"></div>
+							</div>
+						);
+					}
+				}),
+				page = pReact.createClass("page", {
+					render(){
+						return (
+								<div id="header" class="item"></div>
+								<div id="pageview" style={styles.pageview}>
+									<div id="nav" class="item"></div>
+									<div id="search" class="item"></div>
+									<div id="topbanner" class="item"></div>
+									<div id="quota" class="item"></div>
+									<div id="tools" class="item"></div>
+									<div id="tabs" class="item"></div>
+									<div id="group" class="item" style="text-align:center"></div>
+									<div id="listview" class="item"></div>
+									<div id="service" class="item"></div>
+									<div id="progress" class="item"></div>
+									<div id="form">
+										<xform action="" target="_blank" name="xform"></xform>
+									</div>
+									<section>
+										<ul>
+											<li>
+												<div id="adtonglan" class="item"></div>
+												<div id="news" class="item"></div>
+											</li>
+											<li>
+												<div id="adtonglan1" class="item"></div>
+												<div id="shares" class="item"></div>
+											</li>
+											<li>
+												<div id="adtonglan2" class="item"></div>
+												<div id="finan" class="item"></div>
+											</li>
+											<li>
+												<div id="adtonglan3" class="item"></div>
+												<div id="photos" class="item"></div>
+											</li>
+											<li>
+												<div id="adtonglan4" class="item"></div>
+												<div id="blog" class="item"></div>
+											</li>
+										</ul>
+									</section>
+								</div>
+								<div id="footer" class="item"></div>
+						)
+					}
+				}),
+				moduleBox = pReact.createClass("modulebox", {
+					handleAlertClick(e){
+						this._set({
+							style: styles.hide
+						});
+						document.getElementById("modulebox")._remove();
+						/*pReact.renderDom(
+							<moduleBox type="full"  />,
+							document.body
+						);*/
+					},
+					handleFullscreenClick(e){
+						this._parents("#modulebox")._set({
+							style: styles.hide
+						});
+						document.getElementById("modulebox")._remove();
+						/*pReact.renderDom(
+							<moduleBox type="bottom" html="bottom tip!" />,
+							document.body
+						);*/
+					},
+					handleBottomClick(e){
+						this._parents("#modulebox")._set({
+							style: styles.hide
+						});
+						document.getElementById("modulebox")._remove();
+						/*pReact.renderDom(
+							<moduleBox type="top" html="top tip!" />,
+							document.body
+						);*/
+					},
+					handleTopClick(e){
+						this._parents("#modulebox")._set({
+							style: styles.hide
+						});
+						document.getElementById("modulebox")._remove();
+						/*pReact.renderDom(
+							<moduleBox context="警告消息提示：......" type="warn"  />,
+							document.body
+						);*/
+					},
+					handleClick(e){
+						this._append((
+							<div style={styles.a}>
+								<button>111</button>
+							</div>
+						));
+						this._append('<div style={styles.a}><button>111</button></div>');
+						this._parents("#modulebox")._set({
+							style: styles.hide
+						});
+						document.getElementById("modulebox")._remove();
+					},
+					handleEnterClick(e){
+						console.log("enter");
+						this._parents("#modulebox")._set({
+							style: styles.hide
+						});
+						document.getElementById("modulebox")._remove();
+						/*pReact.renderDom(
+							<moduleBox context="test" type="alert"  />,
+							document.body
+						);*/
+					},
+					handleWarnClick(e){
+						this._parents("#modulebox")._set({
+							style: styles.hide
+						});
+						document.getElementById("modulebox")._remove();
+						/*pReact.renderDom(
+							<moduleBox type="loading"  />,
+							document.body,
+							(() => {
+								setTimeout(() => {
+									document.getElementById("modulebox")._set({
+										style: styles.hide
+									})._remove();
+								}, 3000)
+							})
+						);*/
+					},
+					render(){
+						console.log(this);
+						return this._data && this._data.type == "alert" ? (
+							<div id="modulebox" style={styles.modulebox} onclick={handleAlertClick}>
+								<span style={styles.moduleboxView}>{{context}}</span>
+							</div>
+						) : this._data.type == "module" ? (
+							<div id="modulebox" style={styles.modulebox}{styles.a}>
+								<article style={styles.moduleboxView}{styles.moduleboxViewModule}>
+									<header style={styles.moduleboxViewModuleTitle}>{{title}}</header>
+									<article style={styles.moduleboxViewModuleContent} id="moduleboxmain">
+										{{html}}
+									</article>
+									<div style={styles.moduleboxViewModuleControl}>
+										<button style={styles.moduleboxButton} onclick={handleClick}>cancel</button><button style={styles.moduleboxButton}{styles.moduleboxButtonActive} onclick={handleEnterClick}>enter</button>
+									</div>
+								</atricle>
+							</div>
+						) : this._data.type == "imgview" ? (
+							<div id="modulebox" style={styles.modulebox}>
+								<article style={styles.moduleboxView}{styles.moduleboxViewImgView}>
+									<span onclick={handleFullscreenClick} style={styles.moduleboxCloseButton}>close</span>
+									<article style={styles.moduleboxViewModuleContent}{styles.moduleboxViewModuleContentImgView} id="moduleboxmain"></article>
+								</atricle>
+							</div>
+						) : this._data.type == "full" ? (
+							<div id="modulebox" style={styles.modulebox}{styles.moduleboxBlock}>
+								<article style={styles.moduleboxView}{styles.moduleboxViewFullscreen}>
+									<span onclick={handleFullscreenClick} style={styles.moduleboxCloseButton}>close</span>
+									<article style={styles.moduleboxViewModuleContent}{styles.moduleboxViewModuleContentFull} id="moduleboxmain"></article>
+								</atricle>
+							</div>
+						) : this._data.type == "bottom" ? (
+							<div id="modulebox" style={styles.modulebox}>
+								<article style={styles.moduleboxViewBottom}>
+									<span onclick={handleBottomClick} style={styles.moduleboxCloseButton}>close</span>
+									<article style={styles.moduleboxViewModuleContent}{styles.moduleboxViewModuleContentBottom} id="moduleboxmain">{{html}}</article>
+								</atricle>
+							</div>
+						) : this._data.type == "top" ? (
+							<div id="modulebox" style={styles.modulebox}>
+								<article style={styles.moduleboxViewTop}>
+									<span onclick={handleTopClick} style={styles.moduleboxCloseButton}>close</span>
+									<article style={styles.moduleboxViewModuleContent}{styles.moduleboxViewModuleContentBottom} id="moduleboxmain">{{html}}</article>
+								</atricle>
+							</div>
+						) : this._data.type == "loading" ? (
+							<div id="modulebox" style={styles.modulebox}>
+								<div class="page_loading"><div class="spinner"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div></div>
+							</div>
+						) : this._data.type == "androidloading" ? (
+							<div id="modulebox" style={styles.modulebox}{styles.androidloading}>
+								<div class="loader"></div>
+							</div>
+						) : (
+							<div id="modulebox" style={styles.modulebox}>
+								<p style={styles.moduleboxView}{styles.moduleboxWarn}>
+									<span>{{context}}</span>
+									<i style={style.moduleboxCloseX} onclick={handleWarnClick}>x</i>
+								</p>
+							</div>
+						);
+					}
+				}),
+				buttonGroupList = pReact.createClass("buttonGroupList", {
+					getInitData(success, error){
+						success({
+							list:[{
+								title: "button 1"
+							},{
+								title: "button 2"
+							},{
+								title: "button 3"
+							},{
+								title: "button 4"
+							}]
+						})
+					},
+					handleClick(e){
+						var then = this, i=0,
+						p = this.parentNode._findNode("span");
+						p.forEach((e) => {
+							i+=1;
+							var b = Object.is(e, then),
+								style = b ? [styles.buttonGroupButton, styles.buttonGroupButtonActive] : [styles.buttonGroupButton];
+							i===1 ? style.splice(1, 0, styles.buttonGroupButtonFirst) : i >= p.length ? style.splice(1, 0, styles.buttonGroupButtonLast) : null;
+							e._set({
+								style: style.join(';')
+							})
+						});
+					},
+					render(){
+						var b = document.createDocumentFragment(), i=0;
+						this._data && this._data.list.forEach((n) => {
+							i+=1;
+							b.appendChild(i===1 ? pReact.tmpl((
+								<span style={styles.buttonGroupButton}{styles.buttonGroupButtonFirst}{styles.buttonGroupButtonActive} onclick={handleClick}>{{title}}</span>
+							), n) : i >= this._data.list.length ? pReact.tmpl((
+								<span style={styles.buttonGroupButton}{styles.buttonGroupButtonLast} onclick={handleClick}>{{title}}</span>
+							), n) : pReact.tmpl((
+								<span style={styles.buttonGroupButton} onclick={handleClick}>{{title}}</span>
+							), n))
+						});
+						return b;
+					}
+				}),
+				buttonGroup = pReact.createClass("buttonGroup", {
+					render(){
+						return (
+							<div style={styles.fullColumn}{styles.buttonGroup} id="buttongroup">
+							</div>
+						)
+					}
+				}),
+				listView = pReact.createClass("listview", {
+					render(){
+						return (
+							<div style={styles.listView}>
+								<ul id="listviewitems"></ul>
+							</div>
+						)
+					}
+				}),
+				listViewItems = pReact.createClass("listviewitems", {
+					getInitData(success, error){
+						success([{
+							title:"listview item",
+							url:"1",
+							mark: 100
+						},{
+							title:"listview item",
+							url:"2",
+							mark: 5
+						},{
+							title:"listview item",
+							url:"3",
+							mark: 45
+						},{
+							title:"listview item",
+							url:"4",
+							mark: 80
+						},{
+							title:"listview item",
+							url:"5"
+						}])
+					},
+					handleClick(e){
+						console.log(this._attr("data-url"));
+						console.log(this._children("span"));
+						console.log(this._children());
+						console.log(e)
+					},
+					render(){
+						var then = this;
+						var b = document.createDocumentFragment(), i=0;
+						then._data && then._data.data.forEach((n) => {
+							i+=1;
+							b.appendChild(i === then._data.data.length ? pReact.tmpl((
+								<li style={styles.listviewitem}{styles.listviewitemlast} onclick={handleClick} data-url="{{url}}">
+									<span style={styles.listviewitemtitle}>{{title}}</span>
+									<i style={styles.listviewitemicon} class="icon--"></i>
+								</li>
+							), n) : n.mark ? pReact.tmpl((
+								<li style={styles.listviewitem}{styles.listviewitem_mark} onclick={handleClick} data-url="{{url}}" data-mark="{{mark}}">
+									<span style={styles.listviewitemmark} data-style="width:{{mark}}%"></span>
+									<span style={styles.listviewitemtitle}{styles.listviewitemmark_title}>{{title}}</span>
+									<i style={styles.listviewitemicon}{styles.listviewitemmark_icon} class="icon--"></i>
+								</li>
+							), n) : pReact.tmpl((
+								<li style={styles.listviewitem} onclick={handleClick} data-url="{{url}}">
+									<span style={styles.listviewitemtitle}>{{title}}</span>
+									<i style={styles.listviewitemicon} class="icon--"></i>
+								</li>
+							), n))
+						});
+						return b;
+					}
+				}),
+				horizontalbanner = pReact.createClass("horizontalbanner", {
+					handleTouchStart(e){
+						var touches = e.touches[0];
+						this.start = {
+							x: touches.pageX,
+							y: touches.pageY
+						};
+						this.delta = {};
+					},
+					handleTouchMove(e){
+						if (e.touches.length > 1 || e.scale && e.scale !== 1) {
+							return
+						}
+						var touches = e.touches[0];
+						this.end = {
+							x: touches.pageX,
+							y: touches.pageY
+						};
+						this.delta = {
+							x: touches.pageX - this.start.x,
+							y: touches.pageY - this.start.y
+						};
+					},
+					handleTouchEnd(e){
+						var direction = pReact.touchDirection(this.start, this.end);
+						var a = 150,parent =this._findNode("ul"), fz = screen.width / 16, transvalue = screen.width/fz,start = parseInt(this._attr("data-start")) || 0,
+						len = parent[0]._findNode("li").length;
+						switch(direction){
+							case "left":
+								start+=1;
+								start+1>len && (start = 0);
+								this._attr("data-start", start);
+								transvalue = start * transvalue;
+								parent[0]._css({
+									transform: "translate3d(-" + transvalue + "rem, 0, 0)",
+									transitionDuration:"0.5s"
+								});
+								break;
+							case "right":
+								start-=1;
+								start<0 && (start = len-1);
+								this._attr("data-start", start);
+								transvalue = start * transvalue;
+								parent[0]._css({
+									transform: "translate3d(-" + transvalue + "rem, 0, 0)",
+									transitionDuration:"0.5s"
+								});
+								break;
+							case "top":
+								break;
+							case "bottom":
+								break;
+						}
+					},
+					render(){
+						return (
+							<div style={styles.topbanner} ontouchstart={handleTouchStart} ontouchmove={handleTouchMove} ontouchend={handleTouchEnd} data-start="0">
+								<ul style={styles.topbannerItems} id="{{id}}">
+								</ul>
+							</div>
+						)
+					}
+				}),
+				topbanner_list = pReact.createClass("topbanner_list", {
+					getInitData(success, error){
+						success([{
+							img: "img/1.jpg",
+							url: "",
+							title: "广告：比速M3/T3 售6.19万起",
+							desc: "广告：比速M3/T3 售6.19万起"
+						},{
+							img: "img/1.jpg",
+							url: "",
+							title: "金正恩视察革命学院 李雪主陪同植树",
+							desc: "金正恩视察革命学院 李雪主陪同植树"
+						},{
+							img: "img/1.jpg",
+							url: "",
+							title: "云南货车与大巴相撞现场 致10死38伤",
+							desc: "云南货车与大巴相撞现场 致10死38伤"
+						}])
+					},
+					render(){
+						let a = document.createDocumentFragment(), i=0, then = this;
+						this._data && this._data.data.forEach((n) => {
+							i+=1;
+							a.appendChild(pReact.tmpl((
+								<li style={styles.topbannerItem}>
+									<a style={styles.topbannerItemLink}>
+										<img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.topbannerItemImg} />
+									</a>
+									<atricle style={styles.topbannerItemAside}>
+										<h2 style={styles.topbannerItemAsideTitle}>{{title}}</h2>
+										<p style={styles.topbannerItemAsideDesc}>{{desc}}</p>
+										<span style={styles.topbannerItemCount}><i style={styles.topbannerItemCountNum}{styles.red}>{{current}}</i>/<i style={styles.topbannerItemCountNum}>{{count}}</i></span>
+									</atricle>
+								</li>
+							), pReact.extend(n, {
+								current: i,
+								count: then._data.data.length
+							})))
+						});
+						return a;
+					}
+				}),
+				service_list = pReact.createClass("service_list", {
+					getInitData(success, error){
+						success([{
+							img: "1.jpg",
+							url: "",
+							title: "广告：比速M3/T3 售6.19万起",
+							desc: "广告：比速M3/T3 售6.19万起"
+						},{
+							img: "1.jpg",
+							url: "",
+							title: "金正恩视察革命学院 李雪主陪同植树",
+							desc: "金正恩视察革命学院 李雪主陪同植树"
+						},{
+							img: "1.jpg",
+							url: "",
+							title: "云南货车与大巴相撞现场 致10死38伤",
+							desc: "云南货车与大巴相撞现场 致10死38伤"
+						}])
+					},
+					render(){
+						let a = document.createDocumentFragment(), i=0, then = this;
+						this._data && this._data.data.forEach((n) => {
+							i+=1;
+							a.appendChild(pReact.tmpl((
+								<li style={styles.topbannerItem}>
+									<a style={styles.topbannerItemLink}>
+										<img data-src="{{img}}" src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="{{title}}" style={styles.topbannerItemImg} />
+									</a>
+									<atricle style={styles.topbannerItemAside}>
+										<h2 style={styles.topbannerItemAsideTitle}>{{title}}</h2>
+										<p style={styles.topbannerItemAsideDesc}>{{desc}}</p>
+										<span style={styles.topbannerItemCount}><i style={styles.topbannerItemCountNum}{styles.red}>{{current}}</i>/<i style={styles.topbannerItemCountNum}>{{count}}</i></span>
+									</atricle>
+								</li>
+							), pReact.extend(n, {
+								current: i,
+								count: then._data.data.length
+							})))
+						});
+						return a;
+					}
+				}),
+				xform = pReact.createClass("xform", {
+					render(){
+						return (
+							<form action="{{action}}" target="{{target}}" name="{{name}}" style={styles.xform}>
+								<div style={styles.xGroup}{styles.clearfix}>
+									<xinput title="email" type="email" value="" placeholder="Email..." name="email"></xinput>
+									<xinput title="text" type="text" value="" placeholder="Text..." name="text"></xinput>
+									<xinput title="password" type="password" value="" placeholder="Password..." name="password"></xinput>
+									<xinput title="number" type="number" value="" placeholder="Number..." name="number"></xinput>
+									<xinput title="color" type="color" value="" placeholder="Color..." name="color"></xinput>
+									<xinput title="date" type="date" value="" placeholder="Date..." name="date"></xinput>
+									<xinput title="time" type="time" value="" placeholder="Time..." name="time"></xinput>
+									<xinput title="range" type="range" value="" placeholder="Range..." name="range"></xinput>
+									<xinput title="tel" type="tel" value="" placeholder="Tel..." name="tel"></xinput>
+								</div>
+								<div style={styles.xGroup}{styles.clearfix}>
+									<xradio title="option 1" value="1" name="xradio"></xradio>
+									<xradio title="option 2" value="2" name="xradio"></xradio>
+									<xradio title="option 3" value="3" name="xradio"></xradio>
+								</div>
+								<div style={styles.xGroup}{styles.clearfix}>
+									<xcheck title="checkbox 1" value="1" name="xcheck"></xcheck>
+								</div>
+								<div style={styles.xGroup}{styles.clearfix}>
+									<xtextarea title="xtextarea" value="xtextarea test..." name="xtextarea" tip="xtextarea Tip test, xtextarea Tip test, xtextarea Tip test, xtextarea Tip test..."></xtextarea>
+								</div>
+								<div style={styles.xGroup}{styles.clearfix}>
+									<xselect title="xselect" name="xselect"></xselect>
+								</div>
+								<div style={styles.xGroup}{styles.clearfix}>
+									<xbutton title="取消" type="cancel"></xbutton>
+									<xbutton title="提交" type="submit"></xbutton>
+								</div>
+							</form>
+						)
+					}
+				}),
+				xinput = pReact.createClass("xinput", {
+					handleChange(e){
+						switch(this.type){
+							case "range":
+								this.parentNode._findNode("#rangev")[0].innerHTML = this.value;
+								break;
+						}
+					},
+					render(){
+						return /color/.test(this._data.type) ? (
+							<div style={styles.xinput}>
+								<label style={styles.xinputTitle}>{{title}}</label>
+								<input style={styles.xinputInput}{styles.xinputInputAuto} type="{{type}}" value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" />
+							</div>
+						) : /range/.test(this._data.type) ? (
+							<div style={styles.xinput}>
+								<label style={styles.xinputTitle}><span style={styles.marginSpanRight}>{{title}}:</span><span id="rangev">0</span></label>
+								<input style={styles.xinputInput}{styles.xinputInputRange} type="{{type}}" value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" onchange={handleChange} />
+							</div>
+						) : (
+							<div style={styles.xinput}>
+								<label style={styles.xinputTitle}>{{title}}</label>
+								<input style={styles.xinputInput} type="{{type}}" value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" />
+							</div>
+						);
+					}
+				}),
+				xradio = pReact.createClass("xradio", {
+					render(){
+						return (
+							<div style={styles.xradio}>
+								<label>
+									<input type="radio" name="{{name}}" value="{{value}}" style={styles.xradioInput} />
+									<span style={styles.xradioTitle}>{{title}}</span>
+								</label>
+							</div>
+						)
+					}
+				}),
+				xcheck = pReact.createClass("xcheck", {
+					render(){
+						return (
+							<div style={styles.xcheck}>
+								<label>
+									<input type="checkbox" name="{{name}}" value="{{value}}" style={styles.xcheckInput} />
+									<span style={styles.xcheckTitle}>{{title}}</span>
+								</label>
+							</div>
+						)
+					}
+				}),
+				xtextarea = pReact.createClass("xtextarea", {
+					render(){
+						return (
+							<div style={styles.xtextarea}>
+								<label style={styles.xtextareaTitle}>{{title}}</label>
+								<textarea name="{{name}}" style={styles.xtextareaInput}>
+								{{value}}
+								</textarea>
+								<span style={styles.xtextareaTip}>{{tip}}</span>
+							</div>
+						)
+					}
+				}),
+				xselectlist = pReact.createClass("xselectlist", {
+					getInitData(success, error){
+						success([{
+							title:"1",
+							value: 1
+						},{
+							title:"2",
+							value: 2
+						},{
+							title:"3",
+							value: 3
+						},{
+							title:"4",
+							value: 4
+						},{
+							title:"5",
+							value: 5
+						}])
+					},
+					render(){
+						var d = document.createDocumentFragment(), i=0, select = document.createElement("select");
+						select.name = this._data.name;
+						select.style.cssText = styles.xselectInput+";"+styles.xselectInputHidden+";opacity:0";
+						this._data && this._data.data.forEach((n) => {
+							select.appendChild(pReact.tmpl(i===0 ? (
+								<option value="{{value}}" checked="">{{title}}</option>
+							) : (
+								<option value="{{value}}">{{title}}</option>
+							),n));
+							i+=1;
+						});
+						d.appendChild(select);
+						return d;
+					}
+				}),
+				xselect = pReact.createClass("xselect", {
+					render(){
+						return (
+							<div style={styles.xselect}>
+								<label style={styles.xselectTitle}>{{title}}</label>
+								<div style={styles.xselectView}>
+									<span style={styles.xselectInput}{styles.xselectInputHidden} id="selectmain"></span>
+									<span style={styles.xselectInput}>请选择...</span>
+									<span style={styles.xselectTip}><i class="icon-uniE90A"></i></span>
+								</div>
+							</div>
+						)
+					}
+				}),
+				xbutton = pReact.createClass("xbutton", {
+					handleCancelClick(e){
+						console.log("cancel");
+						console.log("index："+this._index());
+						this._set({
+							text: "改后..."
+						})
+					},
+					handleSubmitClick(e){
+						console.log("submit");
+						console.log("index："+this._index());
+						this._animate({opacity: 0}, "slow", () => {
+							console.log("animate end");
+							this._animate({opacity: 1}, "slow", () => {
+								console.log("animate end");
+								this._set({
+									text: "提交中..."
+								})
+							})
+						})
+					},
+					render(){
+						return this._data.type == "cancel" ? (
+							<button type="button" style={styles.xbutton} onclick={handleCancelClick}>{{title}}</button>
+						) : (
+							<button type="button" style={styles.xbutton}{styles.xbuttonActive} onclick={handleSubmitClick}>{{title}}</button>
+						)
+					}
+				}),
+				xnav = pReact.createClass("xnav", {
+					handleClick(e){
+						history.back();
+					},
+					handleMoreClick(e){
+						this._toggleClass("icon--4")._toggleClass("icon--5");
+						let menu = this._children()[0];
+						menu && menu._css("display", menu._css("display") == "none" ? "block" : "none");
+					},
+					handleViewClick(e){
+						let view = this._parents(".preactroot");
+						view._animate({
+							left:(screen.width/baseFontSize).toFixed(4)+"rem"
+						}, "fast", function(){
+							view._remove();
+						});
+					},
+					render(){
+						return this._data && this._data.type == "home" ? (
+							<nav style={styles.xnav}{styles.fullColumn}{styles.headerTop}>
+								<span style={styles.xnavTitle}>{{title}}</span>
+								<div style={styles.xnavMenu}{styles.fullColumn}>
+									<span style={styles.xnavMenuLeftShadow}></span>
+									<span style={styles.xnavMenuRightShadow}></span>
+									<div id="{{menuid}}" style={styles.xnavMenuMain}></div>
+								</div>
+								<span style={styles.xnavMore} id="{{moreid}}" class="icon--4" onclick={handleMoreClick}></span>
+							</nav>
+						) : this._data.type == "view" ? (
+							<nav style={styles.xnav}{styles.fullColumn} data-style="{{style}}">
+								<span style={styles.xnavTitle}{styles.xnav_viewTitle} onclick={handleViewClick} class="icon-uniE90B"></span>
+								<div style={styles.xnavMenu} id="{{menuid}}"></div>
+								<span style={styles.xnavMore}{styles.hide} id="{{moreid}}" class="icon--4" onclick={handleMoreClick}></span>
+							</nav>
+						) : (
+							<nav style={styles.xnav}{styles.fullColumn}{styles.headerTop}>
+								<span style={styles.xnavTitle} onclick={handleClick} class="icon-uniE90B"></span>
+								<div style={styles.xnavMenu} id="{{menuid}}"></div>
+								<span style={styles.xnavMore} id="{{moreid}}" class="icon--4" onclick={handleMoreClick}></span>
+							</nav>
+						)
+					}
+				}),
+				xnavmore_list = pReact.createClass("xnavmore_list", {
+					render(){
+						return (
+							<span style={styles.xnavmoreList}{styles.hide} id="{{id}}">
+							</span>
+						)
+					}
+				}),
+				xnavmore_listItems = pReact.createClass("xnav_morelistitems", {
+					getInitData(success, error){
+						success([{
+							title: "menu 1",
+							url:""
+						},{
+							title: "menu 2",
+							url:""
+						},{
+							title: "menu 3",
+							url:""
+						},{
+							title: "menu 4",
+							url:""
+						},{
+							title: "menu 5",
+							url:""
+						}])
+					},
+					render(){
+						let a = document.createDocumentFragment(), i=0;
+						this._data && this._data.data.forEach((n) => {
+							a.appendChild(pReact.tmpl((
+								<a href="{{url}}" target="_blank" style={styles.xnavmoreListItem}>{{title}}</a>
+							), n))
+						});
+						return a;
+					}
+				}),
+				xnavmenu_list = pReact.createClass("xnavmenu_list", {
+					render(){
+						return (
+							<span style={styles.xnavmenuList} id="{{id}}">
+							</span>
+						)
+					}
+				}),
+				xnavmenu_listItems = pReact.createClass("xnavmenu_listItems", {
+					getInitData(success, error){
+						success([{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						},{
+							title: "item",
+							url:""
+						}])
+					},
+					render(){
+						let a = document.createDocumentFragment(), i=0;
+						this._data && this._data.data.forEach((n) => {
+							a.appendChild(pReact.tmpl((
+								<a href="{{url}}" target="_blank" style={styles.xnavmenuListItem}>{{title}}</a>
+							), n))
+						});
+						return a;
+					}
+				});
+
+			pReact.Callbacks((done) => {
+				pReact.renderDom(
+					<page />,
+					document.getElementById("page"),
+					(() => {
+						pReact.renderDom(
+							<xselectlist name="a" />,
+							document.getElementById("selectmain"),
+							(() => {
+								let a = document.getElementById("selectmain")._findNode("select")[0];
+								pReact.on(a, "change", function(e){
+									let parent = this.parentNode;
+									parent._next().innerHTML = this.value;
+								})
+							})
+						);
+						pReact.renderDom(
+							<moduleBox type="top" html="本网站将使用Cookies。通过继续浏览网站即表示您同意我们使用Cookie的。"  />,
+							document.body
+						);
+						pReact.renderDom(
+							<xnav menuid="xnav_menuview" moreid="xnav_moreview" title="channel" type="home" />,
+							document.getElementById("nav"),
+							(() => {
+								pReact.renderDom(
+									<xnavmore_list id="xnav_morelist" />,
+									document.getElementById("xnav_moreview"),
+									(() => {
+										pReact.renderDom(
+											<xnavmore_listItems />,
+											document.getElementById("xnav_morelist")
+										)
+									})
+								);
+								pReact.renderDom(
+									<xnavmenu_list id="xnav_menulist" />,
+									document.getElementById("xnav_menuview"),
+									(() => {
+										pReact.renderDom(
+											<xnavmenu_listItems />,
+											document.getElementById("xnav_menulist"),
+											(() => {
+												let a = pReact.findNode("#xnav_menulist")[0], w = 0;
+												a._findNode("a").forEach((e) => {
+													w+=e._width(true);
+												});
+												a._css({
+													width:((w+20)/baseFontSize).toFixed(4)+"rem"
+												});
+											})
+										);
+									})
+								);
+							})
+						);
+						pReact.renderDom(
+							<horizontalbanner id="topbanner_view" />,
+							document.getElementById("topbanner"),
+							(() => {
+								pReact.renderDom(
+									<topbanner_list />,
+									document.getElementById("topbanner_view")
+								)
+							})
+						);
+						pReact.renderDom(
+							<horizontalbanner id="service_view" />,
+							document.getElementById("service"),
+							(() => {
+								pReact.renderDom(
+									<service_list />,
+									document.getElementById("service_view")
+								)
+							})
+						);
+						done()
+					})
+				);
+			}, (done) => {
+				pReact.renderDom(
+					<header />,
+					document.getElementById("header"),
+					(() => {
+						done()
+					})
+				);
+			}, (done) => {
+				pReact.renderDom(
+					<footer  />,
+					document.getElementById("footer"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<tools />,
+					document.getElementById("tools"),
+					(() => {
+						pReact.renderDom(
+							<dropButton type="down" title="dropDown Button" />,
+							document.getElementById("toolsmain"),
+							(() => {
+								pReact.renderDom(
+									<dropButtonList />,
+									document.getElementById("dropdown")
+								)
+							})
+						);
+						pReact.renderDom(
+							<dropButton type="up" title="dropUp Button" />,
+							document.getElementById("toolsmain"),
+							(() => {
+								pReact.renderDom(
+									<dropButtonList />,
+									document.getElementById("dropup")
+								);
+							})
+						);
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<search defaultText="search..."  />,
+					document.getElementById("search"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<quota  />,
+					document.getElementById("quota"),
+					(() => {
+						pReact.renderDom(
+							<quotali />,
+							document.getElementById("quotalist"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<tab  />,
+					document.getElementById("tabs"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<buttonGroup  />,
+					document.getElementById("group"),
+					(() => {
+						pReact.renderDom(
+							<buttonGroupList  />,
+							document.getElementById("buttongroup"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<listView />,
+					document.getElementById("listview"),
+					(() => {
+						pReact.renderDom(
+							<listViewItems  />,
+							document.getElementById("listviewitems"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<progress value="50%" />,
+					document.getElementById("progress"),
+					(() => {
+						pReact.renderDom(
+							<progress value="80%" />,
+							document.getElementById("progress"),
+							(() => {
+								pReact.renderDom(
+									<progress value="30%" />,
+									document.getElementById("progress"),
+									(() => {
+										pReact.renderDom(
+											<progress value="90%" />,
+											document.getElementById("progress"),
+											(() => {
+												pReact.renderDom(
+													<progress value="1%" />,
+													document.getElementById("progress"),
+													(() => {
+														done()
+													})
+												)
+											})
+										)
+									})
+								)
+							})
+						)
+					})
+				)
+			}).add((done) => {
+				pReact.renderDom(
+					<adTwoLan  />,
+					document.getElementById("adtonglan"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<news id="newslist" />,
+					document.getElementById("news"),
+					(() => {
+						pReact.renderDom(
+							<newsList />,
+							document.getElementById("newslist"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<adTongLan  />,
+					document.getElementById("adtonglan1"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<news id="shareslist" />,
+					document.getElementById("shares"),
+					(() => {
+						pReact.renderDom(
+							<newsList />,
+							document.getElementById("shareslist"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<adTongLan  />,
+					document.getElementById("adtonglan2"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<news id="finanlist"  />,
+					document.getElementById("finan"),
+					(() => {
+						pReact.renderDom(
+							<newsList />,
+							document.getElementById("finanlist"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<adTongLan  />,
+					document.getElementById("adtonglan3"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<photos id="photoslist" />,
+					document.getElementById("photos"),
+					(() => {
+						pReact.renderDom(
+							<photosList />,
+							document.getElementById("photoslist"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<adTongLan  />,
+					document.getElementById("adtonglan4"),
+					(() => {
+						done()
+					})
+				);
+			}).add((done) => {
+				pReact.renderDom(
+					<news id="bloglist"  />,
+					document.getElementById("blog"),
+					(() => {
+						pReact.renderDom(
+							<newsList />,
+							document.getElementById("bloglist"),
+							(() => {
+								done()
+							})
+						);
+					})
+				);
+			}).delay(1000, (done) => {
+				/*pReact.renderDom(
+					<moduleBox context="test" type="module" title="module box" html="module tip!"  />,
+					document.body,
+					(() => {
+						done()
+					})
+				);*/
+				done();
+			}).add((done) => {
+				pReact.renderDom(
+					<goTop  />,
+					document.body,
+					(() => {
+						done()
+					})
+				);
+			}).done(() => {
+				pReact.loaded();
+				console.log(pReact.findNode("input[type=email]"));
+			});
+		</script>
+	</body>
+</html>
