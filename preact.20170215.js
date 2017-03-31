@@ -1,3 +1,9 @@
+/*!
+ * pReact & pjs template v1.0.0
+ * @author yandong
+ *
+ * https://github.com/ereddate/pReact2017
+ */
 'use strict';
 ((win) => {
 	var doc = win.document,
