@@ -42,7 +42,7 @@ xpage = pReact.createClass("xpage", {
   render(){
     return (
       <div class="page">
-        <xnav id="tools"></xnav>
+        <xnav id="tools" style={styles.xnav}></xnav>
       </div>
     )
   }

@@ -3,7 +3,6 @@
 	var doc = win.document,
 		head = doc.getElementsByTagName("head")[0];
 	win.pReact = {};
-
 	class Callbacks {
 		constructor() {
 			let args = arguments && [...arguments] || [],
@@ -61,7 +60,6 @@
 			return then;
 		}
 	}
-
 	Array.prototype._eq = function(index) {
 		return this[index];
 	};
@@ -71,7 +69,6 @@
 				auxDiv.style.msTransition !== undefined ? 'msTransition' : undefined
 			)
 		);
-
 	const module = {
 		translateContent(content) {
 			content = content.replace(/\s{2,}/gim, " ").replace(/((\()\s*<(\w+)(\s+([a-zA-Z-_0-9]+=["'{][^<>]+["'}]))*\s*>[\r\n]*[^\)]+[\r\n]*<\/\w+>\s*(\)))/gim, ((a, b, c, d, e, f, g) => {
@@ -255,7 +252,6 @@
 		},
 		dir(elem, dir) {
 			var matched = [];
-
 			while ((elem = elem[dir]) && elem.nodeType !== 9) {
 				if (elem.nodeType === 1) {
 					matched.push(elem);
@@ -291,7 +287,6 @@
 				if (typeof time === 'string') {
 					time = times[time];
 				}
-
 				timingFunction = timingFunction || 'linear';
 				for (let s in styles) {
 					list.style[transitionKey] = s + ' ' + time + 'ms ' + timingFunction;
@@ -302,7 +297,6 @@
 					callback.call(list);
 				}, time + 20);
 			}, 20);
-
 			return list;
 		},
 		animate(list, styles, time, callback, timingFunction) {
@@ -310,9 +304,9 @@
 				list.style[transitionKey] = "";
 			}
 			/*list._on(transitionKey + "end " + transitionKey.replace("webkit", "") + "end", function(e) {
-				this._off(transitionKey + "end " + transitionKey.replace("webkit", "") + "end");
-				this.style[transitionKey] = "";
-				callback.call(this);
+			this._off(transitionKey + "end " + transitionKey.replace("webkit", "") + "end");
+			this.style[transitionKey] = "";
+			callback.call(this);
 			});*/
 			module.animateFade(list, styles, time, timingFunction, callback, transitionKey);
 		},
@@ -695,14 +689,12 @@
 			} else {
 				childrens = oldElement._childrens;
 			}
-
 			var element = pReact.createDom.apply(pReact, [oldElement.tagName,
 				module.extend(oldElement._props, options)
 			].concat(childrens || []));
 			element = module.tmpl(element, oldElement._data, oldElement._factory);
 			module.setElementClass(element, oldElement._factory);
 			module.setElementData(element, oldElement._data);
-
 			var parent = oldElement.parentNode;
 			module.toggle(parent, () => {
 				parent && parent.replaceChild(element, oldElement);
@@ -945,7 +937,6 @@
 		},
 		eventData: []
 	};
-
 	pReact.extend = module.extend;
 	pReact.extend(pReact, {
 		import (url) {
@@ -1083,7 +1074,6 @@
 						}
 						callback && callback();
 					};
-
 				module.is(obj._data, undefined) && (obj._data = {});
 				(!module.is(data, undefined) || module.isPlainObject(data)) && module.extend(obj._data, data);
 				("getInitData" in obj) && (new Promise((resolve, reject) => {
@@ -1320,15 +1310,12 @@
 			return !Object.is(module.Styles[name], undefined) && module.Styles[name];
 		}
 	});
-
 	pReact.ready();
 })(this);
-
 pReact && (((pReact) => {
 	pReact.jsonp = (url, data, ops) => {
 		if (url == "") return;
 		if (!data) data = "";
-
 		var complete = function(result, success, error) {
 				if (result && result.status === 1) {
 					success && success(result.data || result, result.msg || "success.", result.code || 1, result);
@@ -1382,7 +1369,6 @@ pReact && (((pReact) => {
 					fail(error, e.message);
 				}
 			};
-
 		return {
 			done: function(success, error) {
 				setTimeout(function() {
@@ -1461,7 +1447,7 @@ pReact && (((pReact) => {
 				len = text.length,
 				vtext = "";
 			for (var i = 0; i < len; i++) {
-				vtext = text.substr(i, 1).replace("¡°", " ").replace("¡±", " ");
+				vtext = text.substr(i, 1).replace("â€œ", " ").replace("â€", " ");
 				if (/([^\x00-\xff]|[A-Z])/.test(vtext)) {
 					n += 2;
 				} else {
@@ -1509,7 +1495,6 @@ pReact && (((pReact) => {
 				j = (j = i.length) > 3 ? j % 3 : 0;
 			return symbol + negative + (j ? i.substr(0, j) + thousand : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousand) + (places ? decimal + Math.abs(number - i).toFixed(places).slice(2) : "");
 		};
-
 	(pReact.tmplThesaurus || !pReact.tmplThesaurus && (pReact.tmplThesaurus = {})) && pReact.extend(pReact.tmplThesaurus, {
 		filter(val, filterCondition) {
 			return _tmplFilterVal(val, filterCondition);
@@ -1704,7 +1689,6 @@ pReact && (((pReact) => {
 	}
 
 	function empty() {}
-
 	let ajaxSettings = {
 		type: 'GET',
 		success: empty,
@@ -1741,18 +1725,14 @@ pReact && (((pReact) => {
 		if (options.data && (!options.type || options.type.toUpperCase() == 'GET'))
 			options.url = appendQuery(options.url, options.data), options.data = undefined
 	}
-
 	var ajax = function(options) {
 		var settings = $.extend({}, options || {})
 		for (let key in ajaxSettings)
 			if (settings[key] === undefined) settings[key] = ajaxSettings[key]
-
 		if (!settings.url) settings.url = window.location.toString()
 		serializeData(settings)
 		if (settings.cache === false) settings.url = appendQuery(settings.url, '_=' + Date.now())
-
 		var dataType = settings.dataType
-
 		var mime = ajaxSettings.accepts[dataType],
 			headers = {},
 			setHeader = function(name, value) {
@@ -1760,7 +1740,6 @@ pReact && (((pReact) => {
 			},
 			protocol = /^([\w-]+:)\/\//.test(settings.url) ? RegExp.$1 : window.location.protocol,
 			xhr = ajaxSettings.xhr()
-
 		setHeader('X-Requested-With', 'XMLHttpRequest')
 		setHeader('Accept', mime || '*/*')
 		if (settings.contentType || (settings.contentType !== false && settings.data && settings.type.toUpperCase() != 'GET'))
@@ -1771,8 +1750,6 @@ pReact && (((pReact) => {
 		console.log(headers)
 		var nativeSetHeader = xhr.setRequestHeader,
 			abortTimeout;
-
-
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				xhr.onreadystatechange = empty
@@ -1781,13 +1758,11 @@ pReact && (((pReact) => {
 				if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 || (xhr.status == 0 && protocol == 'file:')) {
 					dataType = dataType || mimeToDataType(settings.mimeType || xhr.getResponseHeader('content-type'))
 					result = xhr.responseText
-
 					try {
 						if (dataType == 'json') result = blankRE.test(result) ? null : new Function("return " + result)();
 					} catch (e) {
 						error = e
 					}
-
 					if (error) ajaxError(error, 'parsererror', xhr, settings)
 					else ajaxSuccess(result, xhr, settings)
 				} else {
@@ -1795,34 +1770,25 @@ pReact && (((pReact) => {
 				}
 			}
 		}
-
 		if (settings.xhrFields)
 			for (let name in settings.xhrFields) xhr[name] = settings.xhrFields[name]
-
 		var async = 'async' in settings ? settings.async : true
 		xhr.open(settings.type, settings.url, async, settings.username, settings.password)
-
 		for (let name in headers) {
 			console.log(name, headers[name]);
 			nativeSetHeader.apply(xhr, headers[name]);
 		}
-
 		console.log(xhr)
-
 		if (settings.timeout > 0) abortTimeout = setTimeout(function() {
 			xhr.onreadystatechange = empty
 			xhr.abort()
 			ajaxError(null, 'timeout', xhr, settings)
 		}, settings.timeout)
-
 		xhr.send(settings.data ? settings.data : null)
 		return {
-			error() {
-
-			}
+			error() {}
 		}
 	}
-
 	$.each(["get", "post"], (i, name) => {
 		$[name] = (url, data, success, error, type, options) => {
 			if (typeof error == "string") {
@@ -1856,7 +1822,6 @@ pReact && (((pReact) => {
 			return $;
 		}
 	});
-
 	var escape = encodeURIComponent
 
 	function serialize(params, obj, traditional, scope) {
@@ -1872,7 +1837,6 @@ pReact && (((pReact) => {
 			else params.add(key, value)
 		})
 	}
-
 	$.serialize = function(obj, traditional) {
 		var params = []
 		params.add = function(k, v) {
