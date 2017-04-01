@@ -158,7 +158,7 @@
 											return g(a, b, e);
 										})) : a.value;
 									else if (/data-style/.test(a.name.toLowerCase()))
-										options[a.name.toLowerCase().replace("data-", "")] = e.getAttribute(a.name.toLowerCase().replace("data-", "")) + a.value;
+										options[a.name.toLowerCase().replace("data-", "")] = (e.getAttribute(a.name.toLowerCase().replace("data-", "")) || "") + a.value;
 									else
 										options[a.name] = /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
 											return g(a, b, e);
@@ -196,7 +196,7 @@
 											return g(a, b, e);
 										}))) : a.value), e._removeAttr("data-src data-poster"));
 									else if (/data-style/.test(a.name.toLowerCase()))
-										(e.setAttribute(a.name.toLowerCase().replace("data-", ""), e.getAttribute(a.name.toLowerCase().replace("data-", "")) + a.value), e._removeAttr("data-style"));
+										(e.setAttribute(a.name.toLowerCase().replace("data-", ""), (e.getAttribute(a.name.toLowerCase().replace("data-", "")) || "") + a.value), e._removeAttr("data-style"));
 									else
 										e.setAttribute(a.name, /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
 											return g(a, b, e);
@@ -279,7 +279,7 @@
 				})) + ":" + e[1].replace(/\"/gi, "").replace(/\'/gi, ""));
 			});
 			//console.log(val, a.join(';'))
-			return a.join(';')
+			return a.join(';') + ";"
 		},
 		animateFade(list, styles, time, timingFunction, callback, transitionKey) {
 			let then = this;
@@ -908,7 +908,10 @@
 			});
 		},
 		Class: {},
-		Styles: {},
+		Styles: {
+			flexrow: "display: flex; flex-flow: row; justify-content: space-between; ",
+			flexcolumn: "display: flex; flex-flow: column; justify-content: space-between; "
+		},
 		trim(str) {
 			return str.replace(/(^\s*)|(\s*$)/g, "");
 		},
@@ -1036,13 +1039,15 @@
 			return Reflect.get(module.Class, name.toLowerCase());
 		},
 		createStyle(style) {
-			module.extend(module.Styles, (() => {
-				for (let name in style) {
+			for (let name in style) {
+				if (!Reflect.has(module.Styles, name))
 					style[name] = module.toStyle(style[name]);
+				else {
+					Reflect.deleteProperty(style, name);
+					style[name] = module.Styles[name];
 				}
-				return style;
-			})());
-			return style;
+			}
+			return module.extend(module.Styles, style);
 		},
 		renderDom(name, data, parent, callback) {
 			if (!Object.is(parent, null)) {
@@ -1132,9 +1137,9 @@
 				doc.createElement(e[i])
 			}
 			module.setFontSize(num);
-			window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", (() => {
+			pReact.on(window, "orientationchange resize", () => {
 				module.setFontSize(num);
-			}), false);
+			});
 			return this;
 		},
 		getBaseFontSize(num) {

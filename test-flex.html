@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="preact.20170215.js"></script>
+		<style>
+			body {
+				background: #f4f5f7;
+				font-family: 微软雅黑;
+			}
+			body, ul, p {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="page"></div>
+		<script type="text/pReact">
+			let baseFontSize = window.baseFontSize || pReact.getBaseFontSize(),
+				styles = pReact.createStyle({
+					itemrow:{
+						width:(100/5)+"%",
+						margin:(5/baseFontSize).toFixed(4)+"rem",
+						background:"rgb(100,149,237)"
+					},
+					itemcolumn:{
+						width:((screen.width-10)/baseFontSize).toFixed(4)+"rem",
+						margin:(5/baseFontSize).toFixed(4)+"rem",
+						height:(50/baseFontSize).toFixed(4)+"rem",
+						background:"rgb(255,215,0)"
+					},
+					rowfull:{
+						height:(300/baseFontSize).toFixed(4)+"rem"
+					},
+					itemrowfull:{
+						height:"auto"
+					},
+					a:{
+						height:(50/baseFontSize).toFixed(4)+"rem"
+					},
+					b:{
+						height:(80/baseFontSize).toFixed(4)+"rem"
+					},
+					c:{
+						height:(30/baseFontSize).toFixed(4)+"rem"
+					},
+					d:{
+						height:(130/baseFontSize).toFixed(4)+"rem"
+					},
+					e:{
+						height:(100/baseFontSize).toFixed(4)+"rem"
+					}
+				});
+			let demo = pReact.createClass("demo", {
+				render(){
+					return (
+						<div data-style="{{main}}">
+							<div style={styles.a} data-style="{{item}}"></div>
+							<div style={styles.b} data-style="{{item}}"></div>
+							<div style={styles.c} data-style="{{item}}"></div>
+							<div style={styles.d} data-style="{{item}}"></div>
+							<div style={styles.e} data-style="{{item}}"></div>
+						</div>
+					)
+				}
+			});
+			pReact.renderDom(
+				<demo main={styles.flexrow} item={styles.itemrow} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demo main={styles.flexcolumn} item={styles.itemcolumn} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demo main={styles.flexrow}{styles.rowfull} item={styles.itemrow}{styles.itemrowfull} />,
+				document.getElementById("page")
+			);
+		</script>
+	</body>
+</html>

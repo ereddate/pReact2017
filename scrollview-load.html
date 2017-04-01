@@ -60,6 +60,7 @@
 							this.pointY = touch.pageY - (this.currentY || 0);
 						};
 						that.parent.ontouchmove = function(e) {
+							e.preventDefault();
 							var touch = e.changedTouches[0];
 							var deltaY = touch.pageY - this.pointY - that.topOffset;
 							this.currentY = touch.pageY + deltaY + that.topOffset;
@@ -75,7 +76,7 @@
 									iscroll.animate(that.content, 0, "-" + that.topOffset, 0, that.unit);
 								}) : iscroll.animate(that.content, 0, "-" + that.topOffset, 0, that.unit);
 								this.currentY = 0;
-							} else if (this.currentY < this.maxscroll) {
+							} else if (this.currentY > 0 && this.currentY < this.maxscroll) {
 								iscroll.animate(that.content, 0, this.maxscroll, 0, that.unit);
 							}
 						};

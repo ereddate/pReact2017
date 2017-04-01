@@ -201,7 +201,7 @@
 					red:{
 						color:"red"
 					},
-					fullColumn:{
+					flexRow:{
 						display: "flex",
 						flexFlow: "row"
 					},
@@ -1096,7 +1096,7 @@
 				tools = pReact.createClass("tools", {
 					render(){
 						return (
-							<div style={styles.tools}{styles.fullColumn} id="toolsmain">
+							<div style={styles.tools}{styles.flexRow} id="toolsmain">
 							</div>
 						)
 					}
@@ -1236,7 +1236,7 @@
 					render(){
 						return (
 							<div style={styles.tab} class="tab">
-								<div style={styles.tabButtonControl}{styles.fullColumn}>
+								<div style={styles.tabButtonControl}{styles.flexRow}>
 									<span style={styles.tabButton}{styles.threeColumnItem}{styles.tabButtonActive} onclick={handleClick}>1<i style={styles.tabButtonTip}>99+</i></span>
 									<span style={styles.tabButton}{styles.threeColumnItem} onclick={handleClick}>2</span>
 									<span style={styles.tabButton}{styles.threeColumnItem} onclick={handleClick}>3<i style={styles.tabButtonTip}>99+</i></span>
@@ -1302,7 +1302,7 @@
 					},
 					render(){
 						return (
-							<div style={styles.fullColumn}{styles.quota} class="quotamain">
+							<div style={styles.flexRow}{styles.quota} class="quotamain">
 								<span style={styles.refreshContent} onclick={handleClick}>换一换</span>
 								<ul style={styles.quotaUl} id="quotalist"></ul>
 							</div>
@@ -1584,7 +1584,7 @@
 				adTwoLan = pReact.createClass("adTongLan",{
 					render(){
 						return (
-							<div style={styles.fullColumn}{styles.adTongLan}>
+							<div style={styles.flexRow}{styles.adTongLan}>
 								<span style={styles.twoColumnItem}>ad_tonglan</span><span style={styles.twoColumnItem}>ad_tonglan</span>
 							</div>
 						)
@@ -1943,7 +1943,7 @@
 				buttonGroup = pReact.createClass("buttonGroup", {
 					render(){
 						return (
-							<div style={styles.fullColumn}{styles.buttonGroup} id="buttongroup">
+							<div style={styles.flexRow}{styles.buttonGroup} id="buttongroup">
 							</div>
 						)
 					}
@@ -2357,9 +2357,9 @@
 					},
 					render(){
 						return this._data && this._data.type == "home" ? (
-							<nav style={styles.xnav}{styles.fullColumn}{styles.headerTop}>
+							<nav style={styles.xnav}{styles.flexRow}{styles.headerTop}>
 								<span style={styles.xnavTitle}>{{title}}</span>
-								<div style={styles.xnavMenu}{styles.fullColumn}>
+								<div style={styles.xnavMenu}{styles.flexRow}>
 									<span style={styles.xnavMenuLeftShadow}></span>
 									<span style={styles.xnavMenuRightShadow}></span>
 									<div id="{{menuid}}" style={styles.xnavMenuMain}></div>
@@ -2367,13 +2367,13 @@
 								<span style={styles.xnavMore} id="{{moreid}}" class="icon--4" onclick={handleMoreClick}></span>
 							</nav>
 						) : this._data.type == "view" ? (
-							<nav style={styles.xnav}{styles.fullColumn} data-style="{{style}}">
+							<nav style={styles.xnav}{styles.flexRow} data-style="{{style}}">
 								<span style={styles.xnavTitle}{styles.xnav_viewTitle} onclick={handleViewClick} class="icon-uniE90B"></span>
 								<div style={styles.xnavMenu} id="{{menuid}}"></div>
 								<span style={styles.xnavMore}{styles.hide} id="{{moreid}}" class="icon--4" onclick={handleMoreClick}></span>
 							</nav>
 						) : (
-							<nav style={styles.xnav}{styles.fullColumn}{styles.headerTop}>
+							<nav style={styles.xnav}{styles.flexRow}{styles.headerTop}>
 								<span style={styles.xnavTitle} onclick={handleClick} class="icon-uniE90B"></span>
 								<div style={styles.xnavMenu} id="{{menuid}}"></div>
 								<span style={styles.xnavMore} id="{{moreid}}" class="icon--4" onclick={handleMoreClick}></span>
