@@ -245,7 +245,7 @@ trim
   清除字符串空格
 
 ```
-# Element对象私有方法
+# Element对象私有方法，支持伪类选择器（例如："div:contents","div:parents","div:children","div:text"等等）。
 ```
 _set(option)
 按配置重绘原有Element
@@ -378,5 +378,14 @@ _scrollLeft(value)
 
 _scrollTop(value)
 滚动条的垂直偏移
+
+_first()
+第一个子节点
+
+_last()
+最后一个子节点
+
+_eq(index)
+选取带有指定索引值的元素
 
 ```
