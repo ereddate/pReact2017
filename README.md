@@ -259,6 +259,9 @@ trim
   清除字符串空格
 
 touch
+  device
+  判断设备及浏览器类型，os和browser
+  
   is
   判断是否支持touch
   
