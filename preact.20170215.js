@@ -1358,6 +1358,10 @@
 	});
 	if (typeof module === "object" && typeof module.exports === "object") {
 		module.exports = pReact;
+	} else if (typeof define === "function" && define.amd) {
+		define("preact", [], function() {
+			return pReact;
+		});
 	} else {
 		win.pReact = pReact;
 		pReact.ready();
