@@ -190,6 +190,10 @@ loaded
 loading
   loading()
 
+map
+  map(elements, callback, args)
+  把每个元素通过函数传递到当前匹配集合中，返回处理后的数组
+
 mixElement
   mixElement(element)
   扩展element对象，增加40多个私有方法
@@ -360,6 +364,9 @@ _index()
 
 _prevAll()
 取当前节点前的同父节点的所有节点
+
+_map(callback, arg)
+把每个子节点通过函数传递到当前匹配集合，返回数组
 
 _nextAll()
 取当前节点后的同父节点的所有节点

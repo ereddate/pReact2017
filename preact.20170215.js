@@ -321,6 +321,18 @@
 			callback && callback(element);
 			element && (element.style.visibility = "visible");
 		},
+		map(elems, callback, arg) {
+			let ret = [],
+				i = 0;
+			typeof elems == "array" && elems.forEach((e) => {
+				let result = callback(e, i, arg);
+				if (result) {
+					ret.push(result);
+				}
+				i += 1;
+			});
+			return ret;
+		},
 		mixElement(element) {
 			let attrs = {
 				_set(options) {
@@ -340,6 +352,9 @@
 						}
 					});
 					return result;
+				},
+				_map(callback, arg) {
+					return mod.map(this._children(), callback, arg);
 				},
 				_contents() {
 					let elem = this;
@@ -992,6 +1007,7 @@
 			return promise;
 		},
 		trim: mod.trim,
+		map: mod.map,
 		isPlainObject: mod.isPlainObject,
 		isEmptyObject: mod.isEmptyObject,
 		Class: mod.Class,
