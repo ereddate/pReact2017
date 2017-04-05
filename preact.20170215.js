@@ -74,7 +74,356 @@
 			auxDiv.style.mozTransition !== undefined ? 'mozTransition' : (
 				auxDiv.style.msTransition !== undefined ? 'msTransition' : undefined
 			)
-		);
+		),
+		pSubClass = {
+			_set(options) {
+				var then = this;
+				mod.set(then, options);
+				return this;
+			},
+			_findNode(selector) {
+				var then = this,
+					result = [];
+				selector.split(' ').forEach((e) => {
+					result = result.concat(mod.findNode(then, e));
+				});
+				result.forEach((e) => {
+					if (!e.xTagName) {
+						mod.mixElement(e);
+					}
+				});
+				return result;
+			},
+			_map(callback, arg) {
+				return mod.map(this._children(), callback, arg);
+			},
+			_contents() {
+				let elem = this;
+				return elem.tagName && elem.tagName.toLowerCase() == "iframe" ? elem.contentDocument || elem.contentWindow.document : elem.childNodes && [...elem.childNodes] || [];
+			},
+			_empty() {
+				mod.toggle(this, (element) => {
+					[...element.childNodes].forEach((e) => {
+						e._remove();
+					})
+				});
+				return this;
+			},
+			_parents(selector) {
+				var then = this;
+				return mod.parents(then, selector);
+			},
+			_attr(name, value) {
+				var then = this;
+				return !mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
+					element.setAttribute(e.name, e.value);
+				}) || !mod.is(typeof value, "undefined") && then.setAttribute(name, value) || then.getAttribute(name);
+			},
+			_children(selector) {
+				if (selector) {
+					return [...this.querySelectorAll(selector)]
+				} else {
+					return [...this.children];
+				}
+			},
+			_removeAttr(name) {
+				name.split(' ').forEach((n) => {
+					this.removeAttribute(n);
+				});
+				return this;
+			},
+			_text(value) {
+				let then = this,
+					nodeType = then.nodeType;
+				if (nodeType) {
+					if ((nodeType === 1 || nodeType === 9 || nodeType === 11) && typeof then.textContent === "string") {
+						if (value) {
+							then.textContent = value;
+							return this;
+						} else {
+							return then.textContent;
+						}
+					} else if (nodeType === 3 || nodeType === 4) {
+						if (value) {
+							then.nodeValue = value;
+							return this;
+						} else {
+							return then.nodeValue;
+						}
+					} else {
+						return value ? this : "";
+					}
+				} else {
+					return value ? this : "";
+				}
+			},
+			_html(value) {
+				let then = this;
+				if (typeof value != "boolean") {
+					if (typeof value == "string") {
+						then.innerHTML = value;
+					} else if (value.nodeType) {
+						then._append(value);
+					} else if (typeof value == "function") {
+						then._html(value());
+					} else {
+						return then;
+					}
+				} else if (value === true) {
+					return then.outerHTML;
+				} else {
+					return then.innerHTML;
+				}
+			},
+			_clone(bool) {
+				let nE = this.cloneNode(!mod.is(typeof bool, "undefined") ? bool : true);
+				bool === true && mod.cloneHandle(nE, this);
+				return nE;
+			},
+			_on(eventName, fn) {
+				mod.on(this, eventName, fn);
+				return this;
+			},
+			_off(eventName) {
+				mod.off(this, eventName);
+				return this;
+			},
+			_trigger(eventName) {
+				mod.trigger(this, eventName);
+				return this;
+			},
+			_one(eventName, fn) {
+				mod.on(this, eventName, fn, true);
+				return this;
+			},
+			_remove(element) {
+				mod.clearHandle(element);
+				element && element.nodeType && this.removeChild(element) || this.parentNode && this.parentNode.removeChild(this);
+				return this;
+			},
+			_append(element) {
+				if (mod.is(typeof element, "string")) {
+					element = new Function("return " + mod.translateContent("(" + mod.tmpl(element) + ")"))();
+					this.appendChild(element);
+					mod.cloneHandle(element);
+				} else if (mod.is(typeof element, "function")) {
+					element(this);
+				} else {
+					this.appendChild(element);
+					mod.cloneHandle(element);
+				}
+				return this;
+			},
+			_appendTo(element) {
+				element.appendChild(this);
+				mod.cloneHandle(this);
+				return this;
+			},
+			_first() {
+				return this._children()._eq(0)
+			},
+			_last() {
+				return this._children()._eq(-1)
+			},
+			_prepend(element) {
+				let previous = this.firstChild;
+				previous && this.insertBefore(element, previous) || this.appendChild(element);
+				mod.cloneHandle(element);
+				return this;
+			},
+			_prependTo(element) {
+				element._prepend(this);
+				return this;
+			},
+			_after(element) {
+				let next = this[i].nextElementSibling || this[i].nextSibling;
+				next && this.parentNode.insertBefore(element, next) || this.parentNode.appendChild(element);
+				return this;
+			},
+			_css(name, value) {
+				var args = arguments,
+					len = args.length;
+				if (len === 0) {
+					return this;
+				} else if (len === 1) {
+					if ("style" in this) {
+						if (mod.is(typeof name, "string")) {
+							var f = [],
+								then = this;
+							name.split(' ').forEach((n) => {
+								f.push(then.style[n]);
+							});
+							return f.length > 1 ? f : f.join('');
+						} else if (mod.isPlainObject(name)) {
+							for (let n in name) {
+								this.style[n] = name[n]
+							}
+							return this;
+						}
+					} else {
+						return this;
+					}
+				} else {
+					this.style[name] = value;
+					return this;
+				}
+			},
+			_addClass(name) {
+				let then = this;
+				name.split(' ').forEach((n) => {
+					then._removeClass(n);
+					then.className += " " + n;
+				});
+				return this;
+			},
+			_removeClass(name) {
+				let then = this;
+				name.split(' ').forEach((n) => {
+					mod.has(then.className, n) && (then.className = then.className.replace(new RegExp("\\s*" + n, "gim"), ""));
+				});
+				return this;
+			},
+			_prop(name, value) {
+				if (typeof value != "undefined") {
+					this[name] = typeof value == "function" ? value.call(this, name, this) : value;
+					return this;
+				} else {
+					return this[name];
+				}
+			},
+			_data(name, value) {
+				if (/^data-/.test(name)) {
+					return this._attr(name, value);
+				}!this._elementData && (this._elementData = {});
+				if (typeof value != "undefined") {
+					this._elementData[name] = value;
+					return this;
+				} else {
+					return this._elementData[name];
+				}
+			},
+			_removeData(name) {
+				if (/^data-/.test(name)) {
+					return this._removeAttr(name);
+				}
+				this._elementData && this._elementData[name] && (delete this._elementData[name]);
+				return this;
+			},
+			_toggleClass(name) {
+				let then = this;
+				name.split(' ').forEach((n) => {
+					mod.has(then.className, n) ? then._removeClass(n) : then._addClass(n);
+				});
+				return this;
+			},
+			_hasClass(name) {
+				let then = this,
+					bool = [];
+				name.split(' ').forEach((n) => {
+					bool.push(mod.has(then.className, n));
+				});
+				return bool.length === 0 ? false : bool.length === 1 ? bool[0] : bool;
+			},
+			_width(value) {
+				let getStyle = window.getComputedStyle(this, null);
+				if (value) {
+					return this.offsetWidth +
+						parseFloat(getStyle.getPropertyValue('border-left-width')) +
+						parseFloat(getStyle.getPropertyValue('margin-left')) +
+						parseFloat(getStyle.getPropertyValue('margin-right')) +
+						parseFloat(getStyle.getPropertyValue('padding-left')) +
+						parseFloat(getStyle.getPropertyValue('padding-right')) +
+						parseFloat(getStyle.getPropertyValue('border-right-width'))
+				} else if (value != undefined) {
+					this.style.width = value;
+				} else {
+					return this.offsetWidth -
+						parseFloat(getStyle.getPropertyValue('border-left-width')) -
+						parseFloat(getStyle.getPropertyValue('padding-left')) -
+						parseFloat(getStyle.getPropertyValue('padding-right')) -
+						parseFloat(getStyle.getPropertyValue('border-right-width'));
+				}
+				return this;
+			},
+			_animate(styles, time, callback, timingFunction) {
+				mod.animate(this, styles, time, callback, timingFunction);
+				return this;
+			},
+			_show() {
+				this._css({
+					display: "block"
+				});
+				return this;
+			},
+			_hide() {
+				this._css({
+					display: "none"
+				});
+				return this;
+			},
+			_height(value) {
+				let getStyle = window.getComputedStyle(this, null);
+				if (value) {
+					return this.offsetHeight +
+						parseFloat(getStyle.getPropertyValue('border-top-width')) +
+						parseFloat(getStyle.getPropertyValue('margin-top')) +
+						parseFloat(getStyle.getPropertyValue('margin-bottom')) +
+						parseFloat(getStyle.getPropertyValue('padding-top')) +
+						parseFloat(getStyle.getPropertyValue('padding-bottom')) +
+						parseFloat(getStyle.getPropertyValue('border-bottom-width'))
+				} else if (value != undefined) {
+					this.style.height = value;
+				} else {
+					return this.offsetHeight -
+						parseFloat(getStyle.getPropertyValue('border-top-width')) -
+						parseFloat(getStyle.getPropertyValue('padding-top')) -
+						parseFloat(getStyle.getPropertyValue('padding-bottom')) -
+						parseFloat(getStyle.getPropertyValue('border-bottom-width'));
+				}
+				return this;
+			},
+			_tmpl(data) {
+				return pReact.tmpl(this.innerHTML, data);
+			},
+			_offset() {
+				return {
+					top: this.offsetTop,
+					left: this.offsetLeft
+				}
+			},
+			_index() {
+				return this.parentNode ? this._prevAll().length : -1;
+			},
+			_prevAll() {
+				return mod.dir(this, "previousElementSibling");
+			},
+			_nextAll() {
+				return mod.dir(this, "nextElementSibling");
+			},
+			_previous() {
+				return this.previousElementSibling;
+			},
+			_next() {
+				return this.nextElementSibling;
+			},
+			_has(a, b) {
+				return mod.has(a, b);
+			},
+			_scrollLeft(value) {
+				if (val === undefined) {
+					return this.window == this ? ("pageXOffset" in win) ? win["pageXOffset"] : this.document.documentElement["scrollTop"] : this["scrollLeft"];
+				}
+				this["scrollLeft"] = val;
+				return this;
+			},
+			_scrollTop(value) {
+				if (value === undefined) {
+					return this.window == this ? ("pageYOffset" in win) ? win["pageYOffset"] : this.document.documentElement["scrollTop"] : this["scrollTop"];
+				}
+				this["scrollTop"] = value;
+				return this;
+			}
+		};
 	const mod = {
 		translateContent(content) {
 			content = content.replace(/\s{2,}/gim, " ").replace(/((\()\s*<(\w+)(\s+([a-zA-Z-_0-9]+=["'{][^<>]+["'}]))*\s*>[\r\n]*[^\)]+[\r\n]*<\/\w+>\s*(\)))/gim, ((a, b, c, d, e, f, g) => {
@@ -334,351 +683,8 @@
 			return ret;
 		},
 		mixElement(element) {
-			let attrs = {
-				_set(options) {
-					var then = this;
-					mod.set(then, options);
-					return this;
-				},
-				_findNode(selector) {
-					var then = this,
-						result = [];
-					selector.split(' ').forEach((e) => {
-						result = result.concat(mod.findNode(then, e));
-					});
-					result.forEach((e) => {
-						if (!e.xTagName) {
-							mod.mixElement(e);
-						}
-					});
-					return result;
-				},
-				_map(callback, arg) {
-					return mod.map(this._children(), callback, arg);
-				},
-				_contents() {
-					let elem = this;
-					return elem.tagName && elem.tagName.toLowerCase() == "iframe" ? elem.contentDocument || elem.contentWindow.document : elem.childNodes && [...elem.childNodes] || [];
-				},
-				_empty() {
-					mod.toggle(this, (element) => {
-						[...element.childNodes].forEach((e) => {
-							e._remove();
-						})
-					});
-					return this;
-				},
-				_parents(selector) {
-					var then = this;
-					return mod.parents(then, selector);
-				},
-				_attr(name, value) {
-					var then = this;
-					return !mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
-						element.setAttribute(e.name, e.value);
-					}) || !mod.is(typeof value, "undefined") && then.setAttribute(name, value) || then.getAttribute(name);
-				},
-				_children(selector) {
-					if (selector) {
-						return [...this.querySelectorAll(selector)]
-					} else {
-						return [...this.children];
-					}
-				},
-				_removeAttr(name) {
-					name.split(' ').forEach((n) => {
-						this.removeAttribute(n);
-					});
-					return this;
-				},
-				_text(value) {
-					let then = this,
-						nodeType = then.nodeType;
-					if (nodeType) {
-						if ((nodeType === 1 || nodeType === 9 || nodeType === 11) && typeof then.textContent === "string") {
-							if (value) {
-								then.textContent = value;
-								return this;
-							} else {
-								return then.textContent;
-							}
-						} else if (nodeType === 3 || nodeType === 4) {
-							if (value) {
-								then.nodeValue = value;
-								return this;
-							} else {
-								return then.nodeValue;
-							}
-						} else {
-							return value ? this : "";
-						}
-					} else {
-						return value ? this : "";
-					}
-				},
-				_html(value) {
-					let then = this;
-					if (typeof value != "boolean") {
-						if (typeof value == "string") {
-							then.innerHTML = value;
-						} else if (value.nodeType) {
-							then._append(value);
-						} else if (typeof value == "function") {
-							then._html(value());
-						} else {
-							return then;
-						}
-					} else if (value === true) {
-						return then.outerHTML;
-					} else {
-						return then.innerHTML;
-					}
-				},
-				_clone(bool) {
-					let nE = this.cloneNode(!mod.is(typeof bool, "undefined") ? bool : true);
-					bool === true && mod.cloneHandle(nE, this);
-					return nE;
-				},
-				_on(eventName, fn) {
-					mod.on(this, eventName, fn);
-					return this;
-				},
-				_off(eventName) {
-					mod.off(this, eventName);
-					return this;
-				},
-				_trigger(eventName) {
-					mod.trigger(this, eventName);
-					return this;
-				},
-				_one(eventName, fn) {
-					mod.on(this, eventName, fn, true);
-					return this;
-				},
-				_remove(element) {
-					mod.clearHandle(element);
-					element && element.nodeType && this.removeChild(element) || this.parentNode && this.parentNode.removeChild(this);
-					return this;
-				},
-				_append(element) {
-					if (mod.is(typeof element, "string")) {
-						element = new Function("return " + mod.translateContent("(" + mod.tmpl(element) + ")"))();
-						this.appendChild(element);
-						mod.cloneHandle(element);
-					} else if (mod.is(typeof element, "function")) {
-						element(this);
-					} else {
-						this.appendChild(element);
-						mod.cloneHandle(element);
-					}
-					return this;
-				},
-				_appendTo(element) {
-					element.appendChild(this);
-					mod.cloneHandle(this);
-					return this;
-				},
-				_first() {
-					return this._children()._eq(0)
-				},
-				_last() {
-					return this._children()._eq(-1)
-				},
-				_prepend(element) {
-					let previous = this.firstChild;
-					previous && this.insertBefore(element, previous) || this.appendChild(element);
-					mod.cloneHandle(element);
-					return this;
-				},
-				_prependTo(element) {
-					element._prepend(this);
-					return this;
-				},
-				_after(element) {
-					let next = this[i].nextElementSibling || this[i].nextSibling;
-					next && this.parentNode.insertBefore(element, next) || this.parentNode.appendChild(element);
-					return this;
-				},
-				_css(name, value) {
-					var args = arguments,
-						len = args.length;
-					if (len === 0) {
-						return this;
-					} else if (len === 1) {
-						if ("style" in this) {
-							if (mod.is(typeof name, "string")) {
-								var f = [],
-									then = this;
-								name.split(' ').forEach((n) => {
-									f.push(then.style[n]);
-								});
-								return f.length > 1 ? f : f.join('');
-							} else if (mod.isPlainObject(name)) {
-								for (let n in name) {
-									this.style[n] = name[n]
-								}
-								return this;
-							}
-						} else {
-							return this;
-						}
-					} else {
-						this.style[name] = value;
-						return this;
-					}
-				},
-				_addClass(name) {
-					let then = this;
-					name.split(' ').forEach((n) => {
-						then._removeClass(n);
-						then.className += " " + n;
-					});
-					return this;
-				},
-				_removeClass(name) {
-					let then = this;
-					name.split(' ').forEach((n) => {
-						mod.has(then.className, n) && (then.className = then.className.replace(new RegExp("\\s*" + n, "gim"), ""));
-					});
-					return this;
-				},
-				_prop(name, value) {
-					if (typeof value != "undefined") {
-						this[name] = typeof value == "function" ? value.call(this, name, this) : value;
-						return this;
-					} else {
-						return this[name];
-					}
-				},
-				_data(name, value) {
-					if (/^data-/.test(name)) {
-						return this._attr(name, value);
-					}!this._elementData && (this._elementData = {});
-					if (typeof value != "undefined") {
-						this._elementData[name] = value;
-						return this;
-					} else {
-						return this._elementData[name];
-					}
-				},
-				_removeData(name) {
-					if (/^data-/.test(name)) {
-						return this._removeAttr(name);
-					}
-					this._elementData && this._elementData[name] && (delete this._elementData[name]);
-					return this;
-				},
-				_toggleClass(name) {
-					let then = this;
-					name.split(' ').forEach((n) => {
-						mod.has(then.className, n) ? then._removeClass(n) : then._addClass(n);
-					});
-					return this;
-				},
-				_hasClass(name) {
-					let then = this,
-						bool = [];
-					name.split(' ').forEach((n) => {
-						bool.push(mod.has(then.className, n));
-					});
-					return bool.length === 0 ? false : bool.length === 1 ? bool[0] : bool;
-				},
-				_width(value) {
-					let getStyle = window.getComputedStyle(this, null);
-					if (value) {
-						return this.offsetWidth +
-							parseFloat(getStyle.getPropertyValue('border-left-width')) +
-							parseFloat(getStyle.getPropertyValue('margin-left')) +
-							parseFloat(getStyle.getPropertyValue('margin-right')) +
-							parseFloat(getStyle.getPropertyValue('padding-left')) +
-							parseFloat(getStyle.getPropertyValue('padding-right')) +
-							parseFloat(getStyle.getPropertyValue('border-right-width'))
-					} else if (value != undefined) {
-						this.style.width = value;
-					} else {
-						return this.offsetWidth -
-							parseFloat(getStyle.getPropertyValue('border-left-width')) -
-							parseFloat(getStyle.getPropertyValue('padding-left')) -
-							parseFloat(getStyle.getPropertyValue('padding-right')) -
-							parseFloat(getStyle.getPropertyValue('border-right-width'));
-					}
-					return this;
-				},
-				_animate(styles, time, callback, timingFunction) {
-					mod.animate(this, styles, time, callback, timingFunction);
-					return this;
-				},
-				_show() {
-					this._css({
-						display: "block"
-					});
-					return this;
-				},
-				_hide() {
-					this._css({
-						display: "none"
-					});
-					return this;
-				},
-				_height(value) {
-					let getStyle = window.getComputedStyle(this, null);
-					if (value) {
-						return this.offsetHeight;
-					} else if (value != undefined) {
-						this.style.height = value;
-					} else {
-						return this.offsetHeight -
-							parseFloat(getStyle.getPropertyValue('border-top-width')) -
-							parseFloat(getStyle.getPropertyValue('padding-top')) -
-							parseFloat(getStyle.getPropertyValue('padding-bottom')) -
-							parseFloat(getStyle.getPropertyValue('border-bottom-width'));
-					}
-					return this;
-				},
-				_tmpl(data) {
-					return pReact.tmpl(this.innerHTML, data);
-				},
-				_offset() {
-					return {
-						top: this.offsetTop,
-						left: this.offsetLeft
-					}
-				},
-				_index() {
-					return this.parentNode ? this._prevAll().length : -1;
-				},
-				_prevAll() {
-					return mod.dir(this, "previousElementSibling");
-				},
-				_nextAll() {
-					return mod.dir(this, "nextElementSibling");
-				},
-				_previous() {
-					return this.previousElementSibling;
-				},
-				_next() {
-					return this.nextElementSibling;
-				},
-				_has(a, b) {
-					return mod.has(a, b);
-				},
-				_scrollLeft(value) {
-					if (val === undefined) {
-						return this.window == this ? ("pageXOffset" in win) ? win["pageXOffset"] : this.document.documentElement["scrollTop"] : this["scrollLeft"];
-					}
-					this["scrollLeft"] = val;
-					return this;
-				},
-				_scrollTop(value) {
-					if (value === undefined) {
-						return this.window == this ? ("pageYOffset" in win) ? win["pageYOffset"] : this.document.documentElement["scrollTop"] : this["scrollTop"];
-					}
-					this["scrollTop"] = value;
-					return this;
-				}
-			};
 			element.tagName && (element.xTagName = "x" + element.tagName.toLowerCase());
-			mod.extend(element, attrs);
+			mod.extend(element, pSubClass);
 			return element;
 		},
 		has(target, obj) {
@@ -1955,4 +1961,211 @@ pReact && (((pReact) => {
 			}
 		};
 	}
+})(pReact), ((pReact) => {
+	pReact.touch = {
+		is: "ontouchstart" in document ? true : false,
+		pinched: function(element, zoomIn, zoomOut) {
+			function getDistance(p1, p2) {
+				var x = p2[0] - p1[0],
+					y = p2[1] - p1[1];
+				return Math.sqrt((x * x) + (y * y));
+			}
+			var dom = pReact.findNode(element)[0],
+				touchend = function(e) {
+					if (this.isOnTouch > 0) {
+						var touchs = e.changedTouches,
+							len = touchs.length;
+						this.isOnTouch += 1;
+						if (len > 1) {
+							this.endX = [touchs[0].clientX, touchs[1].clientX];
+							this.endY = [touchs[0].clientY, touchs[1].clientY];
+							var v = getDistance([this.endX[0], this.endY[0]], [this.endX[1], this.endY[1]]) / getDistance([this.startX[0], this.startY[0]], [this.startX[1], this.startY[1]]);
+							if (v < 1) {
+								zoomIn && zoomIn.call(this, e);
+							} else {
+								zoomOut && zoomOut.call(this, e);
+							}
+						} else if (e.scale && e.scale <= 1) {
+							zoomIn && zoomIn.call(this, e);
+						} else if (e.scale && e.scale > 1) {
+							zoomOut && zoomOut.call(this, e);
+						}
+					}
+					dom._off("touchend", touchend);
+				};
+			dom._on("touchstart", function(e) {
+				this.isOnTouch = 0;
+				var touchs = e.targetTouches,
+					len = touchs.length;
+				if (len > 1) {
+					this.isOnTouch += 1;
+					this.startX = [touchs[0].clientX, touchs[1].clientX];
+					this.startY = [touchs[0].clientY, touchs[1].clientY];
+				}
+				dom._on("touchend", touchend);
+			}).on("touchmove", function(e) {
+				e.preventDefault();
+			});
+			return this;
+		},
+		swipe: function(element, options) {
+			var browser = {
+				addEventListener: !!window.addEventListener,
+				touch: ("ontouchstart" in window) || window.DocumentTouch && document instanceof DocumentTouch
+			};
+			options = pReact.extend({}, options);
+			var start = {},
+				delta = {},
+				end = {};
+
+			function calculateAngle(startPoint, endPoint) {
+				var x = startPoint.x - endPoint.x;
+				var y = endPoint.y - startPoint.y;
+				var r = Math.atan2(y, x); //radians
+				var angle = Math.round(r * 180 / Math.PI); //degrees
+				//ensure value is positive
+				if (angle < 0) {
+					angle = 360 - Math.abs(angle);
+				}
+
+				return angle;
+			}
+
+			function calculateDirection(startPoint, endPoint) {
+				var angle = calculateAngle(startPoint, endPoint);
+
+				if ((angle <= 45) && (angle >= 0)) {
+					return "left";
+				} else if ((angle <= 360) && (angle >= 315)) {
+					return "left";
+				} else if ((angle >= 135) && (angle <= 225)) {
+					return "right";
+				} else if ((angle > 45) && (angle < 135)) {
+					return "down";
+				} else {
+					return "up";
+				}
+			}
+
+			function init(element) {
+				var events = {
+					handleEvent: function(event) {
+						switch (event.type) {
+							case "touchstart":
+								this.start(event);
+								break;
+							case "touchmove":
+								this.move(event);
+								break;
+							case "touchend":
+								this.end(event);
+								break;
+						}
+						if (options.stopPropagation) {
+							event.stopPropagation()
+						}
+					},
+					start: function(event) {
+						var touches = event.touches[0];
+						start = {
+							x: touches.pageX,
+							y: touches.pageY
+						};
+						delta = {};
+						element.addEventListener("touchmove", this, false);
+						element.addEventListener("touchend", this, false)
+					},
+					move: function(event) {
+						if (event.touches.length > 1 || event.scale && event.scale !== 1) {
+							return
+						}
+						if (options.disableScroll) {
+							event.preventDefault()
+						}
+						var touches = event.touches[0];
+						end = {
+							x: touches.pageX,
+							y: touches.pageY
+						}
+						delta = {
+							x: touches.pageX - start.x,
+							y: touches.pageY - start.y
+						};
+					},
+					end: function(event) {
+						var direction = calculateDirection(start, end);
+						var a = 150;
+						((delta.x < -a || delta.x > a) || (delta.y < -a || delta.y > a)) && options.callback && options.callback.call(element, event, direction);
+						element.removeEventListener("touchmove", events, false);
+						element.removeEventListener("touchend", events, false)
+					}
+				};
+				if (browser.addEventListener) {
+					if (browser.touch) {
+						element.addEventListener("touchstart", events, false)
+					}
+				}
+			}
+
+			var target = element;
+
+			pReact.each(target, function() {
+				var element = this;
+				init(element);
+			});
+
+
+			return {
+				done: function(callback) {
+					options.callback = callback;
+					return this;
+				},
+				off: function() {
+					if (browser.addEventListener) {
+						pReact.findNode(target)[0]._off("touchstart");
+					}
+					return this;
+				}
+			};
+		},
+		tap: function(element, callback) {
+			var dom = pReact.findNode(element)[0],
+				start,
+				end, deltaX, deltaY, startTime, endTime, doubleTime;
+			dom._on("touchstart", function(e) {
+				var touches = event.touches[0];
+				startTime = new Date();
+				start = {
+					x: touches.pageX,
+					y: touches.pageY
+				};
+				end = {
+					x: 0,
+					y: 0
+				};
+				deltaX = 0;
+				deltaY = 0;
+				endTime = null;
+			})._on("touchmove", function(e) {
+				var touches = event.touches[0];
+				end = {
+					x: touches.pageX,
+					y: touches.pageY
+				};
+			})._on("touchend", function(e) {
+				endTime = new Date();
+				deltaX = end.x - start.x;
+				deltaY = end.y - start.y;
+				if (deltaX <= 10 && deltaY <= 10 && endTime - startTime > 500) {
+					callback && callback.call(this, e, "singleTap", endTime - startTime);
+					doubleTime = null;
+				} else if (deltaX <= 10 && deltaY <= 10 && endTime - doubleTime < 500) {
+					callback && callback.call(this, e, "doubleTap", endTime - doubleTime);
+				} else {
+					doubleTime = endTime;
+				}
+			});
+			return this;
+		}
+	};
 })(pReact));
