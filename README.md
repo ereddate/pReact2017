@@ -258,6 +258,19 @@ trim
   trim(string)
   清除字符串空格
 
+touch
+  is
+  判断是否支持touch
+  
+  pinched(element, zoomIn, zoomOut)
+  touch缩放，zoomIn和zoomOut是放大缩小后的回调函数
+   
+  swipe(element, options)
+  touch单指滑动，option可能以设置stopPropagation是否开启，disableScroll是否禁止滚动，callback滑动结束后的回调函数
+   
+  tap(element, callback)
+  touch tap单击
+  
 ```
 # Element对象私有方法，支持伪类选择器（例如："div:contents","div:parents","div:children","div:text"等等）。
 ```
