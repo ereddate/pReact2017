@@ -269,7 +269,7 @@ touch
   touch单指滑动，option可能以设置stopPropagation是否开启，disableScroll是否禁止滚动，callback滑动结束后的回调函数
    
   tap(element, callback)
-  touch tap单击
+  touch tap点击，callback会返回值的第二个值是TAP类型是单击（singleTap）还是双击（doubleTap）及第三个值间隔时间
   
 ```
 # Element对象私有方法，支持伪类选择器（例如："div:contents","div:parents","div:children","div:text"等等）。
