@@ -22,11 +22,20 @@ QQ讨论群:9786575
 或者javascript写法：
 ```
 <script>
-  let element = pReact.createDom("iframe", {
-    src:"https://github.com/ereddate/pReact2017"
-  }, pReact.createDom("span", {
-    html:"pReact demo"
-  }, ...));
+  let element = pReact.createDom(
+    "iframe",
+    {
+      src:"https://github.com/ereddate/pReact2017",
+      ...
+    },
+    pReact.createDom(
+      "span",
+      {
+        html:"pReact demo",
+        ...
+      }, ...
+    )
+  );
 </script>
 ```
 # 对象间的引用：
