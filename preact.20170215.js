@@ -67,7 +67,7 @@
 		}
 	}
 	Array.prototype._eq = function(index) {
-		return this[index];
+		return index<0 ? this[this.length+index] : this[index];
 	};
 	let auxDiv = document.createElement('div'),
 		transitionKey = auxDiv.style.webkitTransition !== undefined ? 'webkitTransition' : (
@@ -332,7 +332,7 @@
 					var then = this,
 						result = [];
 					selector.split(' ').forEach((e) => {
-						result = result.concat(module.fineNode(then, e));
+						result = result.concat(module.findNode(then, e));
 					});
 					result.forEach((e) => {
 						if (!e.xTagName) {
@@ -462,6 +462,12 @@
 					element.appendChild(this);
 					module.cloneHandle(this);
 					return this;
+				},
+				_first(){
+					return this._children()._eq(0)
+				},
+				_last(){
+					return this._children()._eq(-1)
 				},
 				_prepend(element) {
 					let previous = this.firstChild;
@@ -706,7 +712,7 @@
 				parent && parent.replaceChild(element, oldElement);
 			});
 		},
-		fineNode(element, selector) {
+		findNode(element, selector) {
 			if (/^name=/.test(selector)) {
 				let children = document.getElementsByName && document.getElementsByName(selector.toLowerCase().replace(/^name=/gim, ""));
 				if (children) {
@@ -716,12 +722,25 @@
 				let reg = /([^\[\]]+)\s*\[([^\[\]]+)\]/.exec(selector);
 				if (reg) {
 					let nodes = [];
-					//console.log(exp);
 					[...element.querySelectorAll(reg[1])].forEach((e) => {
 						let exp = new RegExp(reg[2].split('=')[1].replace(/\:/gim, "\\s*\\:\\s*"), "gim"),
 							is = exp.test(e.getAttribute(reg[2].split('=')[0]));
 						if (is) {
 							nodes.push(e);
+						}
+					});
+					return nodes;
+				}
+			} else if (/\:/.test(selector)){
+				let reg = /([^\[\]]+)\s*\:\s*([^\[\]]+)/.exec(selector);
+				if (reg){
+					let nodes = [];
+					[...element.querySelectorAll(reg[1])].forEach((e) => {
+						let elems = e["_"+reg[2]] && e["_"+reg[2]]() || null;
+						if (elems && elems.nodeType) {
+							nodes.push(elems);
+						}else if (elems && elems.length>0){
+							module.extend(nodes, elems);
 						}
 					});
 					return nodes;
@@ -991,10 +1010,10 @@
 		findNode(element, selector) {
 			let elems = [];
 			if (!selector) {
-				elems = typeof element == "string" ? module.fineNode(document, element) : element.nodeType ? [element] : element.document ? [window] : [element];
+				elems = typeof element == "string" ? module.findNode(document, element) : element.nodeType ? [element] : element.document ? [window] : [element];
 			} else {
 				select.splice(' ').forEach((e) => {
-					elems = elems.concat(module.fineNode(element, e));
+					elems = elems.concat(module.findNode(element, e));
 				});
 			}
 			elems.forEach((e) => {
