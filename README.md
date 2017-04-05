@@ -1,5 +1,6 @@
 # pReact2017
 ereddate/pReact的另一个版本，写法有些类似react、jQuery。
+QQ讨论群:9786575
 
 模板数据的过滤方式及过滤功能与ereddate/pReact相同，如：{{dataname | lowercase}}。
 # 引用
