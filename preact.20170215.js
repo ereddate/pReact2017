@@ -7,8 +7,8 @@
 'use strict';
 ((win) => {
 	var doc = win.document,
-		head = doc.getElementsByTagName("head")[0];
-	win.pReact = {};
+		head = doc.getElementsByTagName("head")[0],
+		pReact = {};
 	class Callbacks {
 		constructor() {
 			let args = arguments && [...arguments] || [],
@@ -67,7 +67,7 @@
 		}
 	}
 	Array.prototype._eq = function(index) {
-		return index<0 ? this[this.length+index] : this[index];
+		return index < 0 ? this[this.length + index] : this[index];
 	};
 	let auxDiv = document.createElement('div'),
 		transitionKey = auxDiv.style.webkitTransition !== undefined ? 'webkitTransition' : (
@@ -75,7 +75,7 @@
 				auxDiv.style.msTransition !== undefined ? 'msTransition' : undefined
 			)
 		);
-	const module = {
+	const mod = {
 		translateContent(content) {
 			content = content.replace(/\s{2,}/gim, " ").replace(/((\()\s*<(\w+)(\s+([a-zA-Z-_0-9]+=["'{][^<>]+["'}]))*\s*>[\r\n]*[^\)]+[\r\n]*<\/\w+>\s*(\)))/gim, ((a, b, c, d, e, f, g) => {
 				b = b.replace(c, "").replace(new RegExp("\\" + g + "$"), "").replace(/>\s+</gim, "><");
@@ -306,7 +306,7 @@
 			return list;
 		},
 		animate(list, styles, time, callback, timingFunction) {
-			if (module.is(list.style[transitionKey].replace(/\s+/gim, ""), "")) {
+			if (mod.is(list.style[transitionKey].replace(/\s+/gim, ""), "")) {
 				list.style[transitionKey] = "";
 			}
 			/*list._on(transitionKey + "end " + transitionKey.replace("webkit", "") + "end", function(e) {
@@ -314,7 +314,7 @@
 			this.style[transitionKey] = "";
 			callback.call(this);
 			});*/
-			module.animateFade(list, styles, time, timingFunction, callback, transitionKey);
+			mod.animateFade(list, styles, time, timingFunction, callback, transitionKey);
 		},
 		toggle(element, callback) {
 			element && (element.style.visibility = "hidden");
@@ -325,18 +325,18 @@
 			let attrs = {
 				_set(options) {
 					var then = this;
-					module.set(then, options);
+					mod.set(then, options);
 					return this;
 				},
 				_findNode(selector) {
 					var then = this,
 						result = [];
 					selector.split(' ').forEach((e) => {
-						result = result.concat(module.findNode(then, e));
+						result = result.concat(mod.findNode(then, e));
 					});
 					result.forEach((e) => {
 						if (!e.xTagName) {
-							module.mixElement(e);
+							mod.mixElement(e);
 						}
 					});
 					return result;
@@ -346,7 +346,7 @@
 					return elem.tagName && elem.tagName.toLowerCase() == "iframe" ? elem.contentDocument || elem.contentWindow.document : elem.childNodes && [...elem.childNodes] || [];
 				},
 				_empty() {
-					module.toggle(this, (element) => {
+					mod.toggle(this, (element) => {
 						[...element.childNodes].forEach((e) => {
 							e._remove();
 						})
@@ -355,13 +355,13 @@
 				},
 				_parents(selector) {
 					var then = this;
-					return module.parents(then, selector);
+					return mod.parents(then, selector);
 				},
 				_attr(name, value) {
 					var then = this;
-					return !module.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
+					return !mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
 						element.setAttribute(e.name, e.value);
-					}) || !module.is(typeof value, "undefined") && then.setAttribute(name, value) || then.getAttribute(name);
+					}) || !mod.is(typeof value, "undefined") && then.setAttribute(name, value) || then.getAttribute(name);
 				},
 				_children(selector) {
 					if (selector) {
@@ -420,59 +420,59 @@
 					}
 				},
 				_clone(bool) {
-					let nE = this.cloneNode(!module.is(typeof bool, "undefined") ? bool : true);
-					bool === true && module.cloneHandle(nE, this);
+					let nE = this.cloneNode(!mod.is(typeof bool, "undefined") ? bool : true);
+					bool === true && mod.cloneHandle(nE, this);
 					return nE;
 				},
 				_on(eventName, fn) {
-					module.on(this, eventName, fn);
+					mod.on(this, eventName, fn);
 					return this;
 				},
 				_off(eventName) {
-					module.off(this, eventName);
+					mod.off(this, eventName);
 					return this;
 				},
 				_trigger(eventName) {
-					module.trigger(this, eventName);
+					mod.trigger(this, eventName);
 					return this;
 				},
 				_one(eventName, fn) {
-					module.on(this, eventName, fn, true);
+					mod.on(this, eventName, fn, true);
 					return this;
 				},
 				_remove(element) {
-					module.clearHandle(element);
+					mod.clearHandle(element);
 					element && element.nodeType && this.removeChild(element) || this.parentNode && this.parentNode.removeChild(this);
 					return this;
 				},
 				_append(element) {
-					if (module.is(typeof element, "string")) {
-						element = new Function("return " + module.translateContent("(" + module.tmpl(element) + ")"))();
+					if (mod.is(typeof element, "string")) {
+						element = new Function("return " + mod.translateContent("(" + mod.tmpl(element) + ")"))();
 						this.appendChild(element);
-						module.cloneHandle(element);
-					} else if (module.is(typeof element, "function")) {
+						mod.cloneHandle(element);
+					} else if (mod.is(typeof element, "function")) {
 						element(this);
 					} else {
 						this.appendChild(element);
-						module.cloneHandle(element);
+						mod.cloneHandle(element);
 					}
 					return this;
 				},
 				_appendTo(element) {
 					element.appendChild(this);
-					module.cloneHandle(this);
+					mod.cloneHandle(this);
 					return this;
 				},
-				_first(){
+				_first() {
 					return this._children()._eq(0)
 				},
-				_last(){
+				_last() {
 					return this._children()._eq(-1)
 				},
 				_prepend(element) {
 					let previous = this.firstChild;
 					previous && this.insertBefore(element, previous) || this.appendChild(element);
-					module.cloneHandle(element);
+					mod.cloneHandle(element);
 					return this;
 				},
 				_prependTo(element) {
@@ -491,14 +491,14 @@
 						return this;
 					} else if (len === 1) {
 						if ("style" in this) {
-							if (module.is(typeof name, "string")) {
+							if (mod.is(typeof name, "string")) {
 								var f = [],
 									then = this;
 								name.split(' ').forEach((n) => {
 									f.push(then.style[n]);
 								});
 								return f.length > 1 ? f : f.join('');
-							} else if (module.isPlainObject(name)) {
+							} else if (mod.isPlainObject(name)) {
 								for (let n in name) {
 									this.style[n] = name[n]
 								}
@@ -523,7 +523,7 @@
 				_removeClass(name) {
 					let then = this;
 					name.split(' ').forEach((n) => {
-						module.has(then.className, n) && (then.className = then.className.replace(new RegExp("\\s*" + n, "gim"), ""));
+						mod.has(then.className, n) && (then.className = then.className.replace(new RegExp("\\s*" + n, "gim"), ""));
 					});
 					return this;
 				},
@@ -556,7 +556,7 @@
 				_toggleClass(name) {
 					let then = this;
 					name.split(' ').forEach((n) => {
-						module.has(then.className, n) ? then._removeClass(n) : then._addClass(n);
+						mod.has(then.className, n) ? then._removeClass(n) : then._addClass(n);
 					});
 					return this;
 				},
@@ -564,7 +564,7 @@
 					let then = this,
 						bool = [];
 					name.split(' ').forEach((n) => {
-						bool.push(module.has(then.className, n));
+						bool.push(mod.has(then.className, n));
 					});
 					return bool.length === 0 ? false : bool.length === 1 ? bool[0] : bool;
 				},
@@ -590,7 +590,7 @@
 					return this;
 				},
 				_animate(styles, time, callback, timingFunction) {
-					module.animate(this, styles, time, callback, timingFunction);
+					mod.animate(this, styles, time, callback, timingFunction);
 					return this;
 				},
 				_show() {
@@ -633,10 +633,10 @@
 					return this.parentNode ? this._prevAll().length : -1;
 				},
 				_prevAll() {
-					return module.dir(this, "previousElementSibling");
+					return mod.dir(this, "previousElementSibling");
 				},
 				_nextAll() {
-					return module.dir(this, "nextElementSibling");
+					return mod.dir(this, "nextElementSibling");
 				},
 				_previous() {
 					return this.previousElementSibling;
@@ -645,7 +645,7 @@
 					return this.nextElementSibling;
 				},
 				_has(a, b) {
-					return module.has(a, b);
+					return mod.has(a, b);
 				},
 				_scrollLeft(value) {
 					if (val === undefined) {
@@ -663,7 +663,7 @@
 				}
 			};
 			element.tagName && (element.xTagName = "x" + element.tagName.toLowerCase());
-			module.extend(element, attrs);
+			mod.extend(element, attrs);
 			return element;
 		},
 		has(target, obj) {
@@ -693,7 +693,7 @@
 		set(oldElement, options) {
 			var i = 0,
 				childrens = [];
-			if (!module.is(module.has(options, "text"), false)) {
+			if (!mod.is(mod.has(options, "text"), false)) {
 				oldElement._childrens.forEach((e) => {
 					i += 1;
 					!Object.is(e.nodeType, 3) && childrens.push(e);
@@ -702,13 +702,13 @@
 				childrens = oldElement._childrens;
 			}
 			var element = pReact.createDom.apply(pReact, [oldElement.tagName,
-				module.extend(oldElement._props, options)
+				mod.extend(oldElement._props, options)
 			].concat(childrens || []));
-			element = module.tmpl(element, oldElement._data, oldElement._factory);
-			module.setElementClass(element, oldElement._factory);
-			module.setElementData(element, oldElement._data);
+			element = mod.tmpl(element, oldElement._data, oldElement._factory);
+			mod.setElementClass(element, oldElement._factory);
+			mod.setElementData(element, oldElement._data);
 			var parent = oldElement.parentNode;
-			module.toggle(parent, () => {
+			mod.toggle(parent, () => {
 				parent && parent.replaceChild(element, oldElement);
 			});
 		},
@@ -731,16 +731,16 @@
 					});
 					return nodes;
 				}
-			} else if (/\:/.test(selector)){
+			} else if (/\:/.test(selector)) {
 				let reg = /([^\[\]]+)\s*\:\s*([^\[\]]+)/.exec(selector);
-				if (reg){
+				if (reg) {
 					let nodes = [];
 					[...element.querySelectorAll(reg[1])].forEach((e) => {
-						let elems = e["_"+reg[2]] && e["_"+reg[2]]() || null;
+						let elems = e["_" + reg[2]] && e["_" + reg[2]]() || null;
 						if (elems && elems.nodeType) {
 							nodes.push(elems);
-						}else if (elems && elems.length>0){
-							module.extend(nodes, elems);
+						} else if (elems && elems.length > 0) {
+							mod.extend(nodes, elems);
 						}
 					});
 					return nodes;
@@ -750,8 +750,8 @@
 			return [...node];
 		},
 		bind(handle, element) {
-			for (let name in handle) !/element/.test(name) && (module.on(element, name, ((e) => {
-				if (module.is(typeof handle[e.type], "string")) {
+			for (let name in handle) !/element/.test(name) && (mod.on(element, name, ((e) => {
+				if (mod.is(typeof handle[e.type], "string")) {
 					var fnName = handle[e.type].replace(/\s+/gim, "").replace("{", "").replace("}", "");
 					element._factory[fnName].call(element, e);
 				} else {
@@ -761,9 +761,9 @@
 		},
 		cloneHandle(oldElement, then) {
 			let i = 0;
-			module.eventData.forEach((a) => {
+			mod.eventData.forEach((a) => {
 				i += 1;
-				if (module.is(a.element, oldElement))(then || oldElement)[a.eventName] = ((e) => {
+				if (mod.is(a.element, oldElement))(then || oldElement)[a.eventName] = ((e) => {
 					a.factory.call(this, e)
 				});
 			});
@@ -772,15 +772,15 @@
 		clearHandle(element) {
 			let i = 0,
 				handleObj = [];
-			module.eventData.forEach((a) => {
-				if (module.is(a.element, element)) handleObj.push({
+			mod.eventData.forEach((a) => {
+				if (mod.is(a.element, element)) handleObj.push({
 					obj: a,
 					index: i
 				})
 				i += 1;
 			});
 			handleObj.forEach((a) => {
-				module.eventData.splice(a.index, 1)
+				mod.eventData.splice(a.index, 1)
 			});
 			return this;
 		},
@@ -795,7 +795,7 @@
 			return angle;
 		},
 		touchDirection(startPoint, endPoint) {
-			var angle = module.calculateAngle(startPoint, endPoint);
+			var angle = mod.calculateAngle(startPoint, endPoint);
 			if ((angle <= 45) && (angle >= 0)) {
 				return "left";
 			} else if ((angle <= 360) && (angle >= 315)) {
@@ -816,7 +816,7 @@
 					callback && callback.call(then, e);
 				};
 				then.addEventListener(ev, fn, false);
-				module.eventData.push({
+				mod.eventData.push({
 					element: then,
 					eventName: ev,
 					factory: fn,
@@ -827,20 +827,20 @@
 		},
 		off(then, eventName) {
 			var i = 0;
-			if (module.is(typeof eventName, "undefined")) {
-				module.eventData.forEach((a) => {
+			if (mod.is(typeof eventName, "undefined")) {
+				mod.eventData.forEach((a) => {
 					i += 1;
-					if (module.is(a.element, then)) module.eventData.splice(i, 1)
+					if (mod.is(a.element, then)) mod.eventData.splice(i, 1)
 				});
 				return this;
 			}
 			eventName = eventName.toLowerCase().split(' ');
 			eventName.forEach((ev) => {
-				module.eventData.forEach((a) => {
+				mod.eventData.forEach((a) => {
 					i += 1;
-					if (module.is(a.element, then) && module.is(a.eventName, ev)) {
+					if (mod.is(a.element, then) && mod.is(a.eventName, ev)) {
 						then.removeEventListener(ev, a.factory, false);
-						module.eventData.splice(i, 1);
+						mod.eventData.splice(i, 1);
 					}
 				})
 			});
@@ -849,8 +849,8 @@
 		trigger(then, eventName) {
 			eventName = eventName.toLowerCase().split(' ');
 			eventName.forEach((ev) => {
-				module.eventData.forEach((a) => {
-					if (module.is(a.element, then) && module.is(a.eventName, ev)) {
+				mod.eventData.forEach((a) => {
+					if (mod.is(a.element, then) && mod.is(a.eventName, ev)) {
 						if (ev == "scroll") setTimeout(() => {
 							window.scrollTo(1, 1)
 						}, 1);
@@ -864,7 +864,7 @@
 		},
 		parents(elem, id) {
 			var parent = null;
-			parent = module.dir(elem, "parentNode");
+			parent = mod.dir(elem, "parentNode");
 			if (id) {
 				pReact.each(parent, (i, item) => {
 					if (/^#/.test(id) && item.id && item.id == id.replace("#", "")) {
@@ -895,7 +895,7 @@
 				index = -1;
 			this.state.elements.forEach((e) => {
 				i += 1;
-				module.is(e, element) && module.is(e.tagName, element.tagName) && (classN = e, index = i);
+				mod.is(e, element) && mod.is(e.tagName, element.tagName) && (classN = e, index = i);
 			});
 			return {
 				index: index,
@@ -915,15 +915,15 @@
 			return fontSize;
 		},
 		setElementClass(element, obj) {
-			!element["_factory"] && (module.is(typeof obj, "string") && module.Class[obj] && (element["_factory"] = module.Class[obj])) || (element["_factory"] = obj);
+			!element["_factory"] && (mod.is(typeof obj, "string") && mod.Class[obj] && (element["_factory"] = mod.Class[obj])) || (element["_factory"] = obj);
 			element.childNodes && element.childNodes.length > 0 && [...element.childNodes].forEach((e) => {
-				module.setElementClass(e, obj);
+				mod.setElementClass(e, obj);
 			});
 		},
 		setElementData(element, data) {
 			!element["_data"] && (element["_data"] = data)
 			element.childNodes && element.childNodes.length > 0 && [...element.childNodes].forEach((e) => {
-				module.setElementData(e, data);
+				mod.setElementData(e, data);
 			});
 		},
 		Class: {},
@@ -940,15 +940,15 @@
 				e.attributes && [...e.attributes].forEach((e) => {
 					attrs[e.name] = e.value;
 				})
-				let dom = pReact.createDom(module.is(e.nodeType, 3) ? "textNode" : e.tagName, module.extend(attrs, module.is(e.nodeType, 3) ? {
+				let dom = pReact.createDom(mod.is(e.nodeType, 3) ? "textNode" : e.tagName, mod.extend(attrs, mod.is(e.nodeType, 3) ? {
 					text: e.nodeValue
 				} : {}));
-				var classN = module.diffElement(dom);
+				var classN = mod.diffElement(dom);
 				if (classN.index > -1) {
-					module.setElementClass(module.state.elements[classN.index], obj);
-					module.setElementData(module.state.elements[classN.index], data);
+					mod.setElementClass(mod.state.elements[classN.index], obj);
+					mod.setElementData(mod.state.elements[classN.index], data);
 				}
-				e.childNodes.length > 0 && (dom = module.translateFragment(e, dom, obj, data));
+				e.childNodes.length > 0 && (dom = mod.translateFragment(e, dom, obj, data));
 				frags.appendChild(dom);
 			});
 			return frags;
@@ -965,7 +965,7 @@
 		},
 		eventData: []
 	};
-	pReact.extend = module.extend;
+	pReact.extend = mod.extend;
 	pReact.extend(pReact, {
 		import (url) {
 			let promise = new Promise((resolve, reject) => {
@@ -991,13 +991,13 @@
 			});
 			return promise;
 		},
-		trim: module.trim,
-		isPlainObject: module.isPlainObject,
-		isEmptyObject: module.isEmptyObject,
-		Class: module.Class,
-		Styles: module.Styles,
-		touchDirection: module.touchDirection,
-		mixElement: module.mixElement,
+		trim: mod.trim,
+		isPlainObject: mod.isPlainObject,
+		isEmptyObject: mod.isEmptyObject,
+		Class: mod.Class,
+		Styles: mod.Styles,
+		touchDirection: mod.touchDirection,
+		mixElement: mod.mixElement,
 		Callbacks() {
 			let args = arguments && [...arguments] || [],
 				len = args.length,
@@ -1010,15 +1010,15 @@
 		findNode(element, selector) {
 			let elems = [];
 			if (!selector) {
-				elems = typeof element == "string" ? module.findNode(document, element) : element.nodeType ? [element] : element.document ? [window] : [element];
+				elems = typeof element == "string" ? mod.findNode(document, element) : element.nodeType ? [element] : element.document ? [window] : [element];
 			} else {
 				select.splice(' ').forEach((e) => {
-					elems = elems.concat(module.findNode(element, e));
+					elems = elems.concat(mod.findNode(element, e));
 				});
 			}
 			elems.forEach((e) => {
 				if (!e.xTagName) {
-					module.mixElement(e);
+					mod.mixElement(e);
 				}
 			});
 			return elems;
@@ -1037,52 +1037,52 @@
 					return "array" === c || 0 === len || "number" == typeof len && len > 0 && len - 1 in a
 					break;
 			}
-			return module.is(a, b);
+			return mod.is(a, b);
 		},
 		on(element, eventName, fn) {
-			module.on(element, eventName, fn);
+			mod.on(element, eventName, fn);
 			return this;
 		},
 		off(element, eventName) {
-			module.off(element, eventName);
+			mod.off(element, eventName);
 			return this;
 		},
 		extend(a, b) {
-			a = module.extend(a, b);
+			a = mod.extend(a, b);
 			return a;
 		},
 		createClass(name, classObject) {
-			Reflect.defineProperty(module.Class, name.toLowerCase(), {
+			Reflect.defineProperty(mod.Class, name.toLowerCase(), {
 				value: classObject
 			});
-			return Reflect.get(module.Class, name.toLowerCase());
+			return Reflect.get(mod.Class, name.toLowerCase());
 		},
 		createStyle(style) {
 			for (let name in style) {
-				if (!Reflect.has(module.Styles, name))
-					style[name] = module.toStyle(style[name]);
+				if (!Reflect.has(mod.Styles, name))
+					style[name] = mod.toStyle(style[name]);
 				else {
 					Reflect.deleteProperty(style, name);
-					style[name] = module.Styles[name];
+					style[name] = mod.Styles[name];
 				}
 			}
-			return module.extend(module.Styles, style);
+			return mod.extend(mod.Styles, style);
 		},
 		renderDom(name, data, parent, callback) {
 			if (!Object.is(parent, null)) {
-				let obj = (module.is(typeof name, "string") ? Reflect.get(module.Class, name.toLowerCase()) : name),
+				let obj = (mod.is(typeof name, "string") ? Reflect.get(mod.Class, name.toLowerCase()) : name),
 					element,
 					toElements = (element) => {
-						if (module.is(typeof element, "string")) {
+						if (mod.is(typeof element, "string")) {
 							var fragment = document.createDocumentFragment(),
 								temp = document.createElement("div");
-							element = module.tmpl(element, data, obj);
+							element = mod.tmpl(element, data, obj);
 							temp.innerHTML = element;
-							fragment = module.translateFragment(temp, fragment, obj, data);
+							fragment = mod.translateFragment(temp, fragment, obj, data);
 							//parent.innerHTML = "";
 							parent.appendChild(fragment);
 						} else {
-							element = module.tmpl(element, data, obj);
+							element = mod.tmpl(element, data, obj);
 							//parent.innerHTML = "";
 							parent.appendChild(element);
 						}
@@ -1092,7 +1092,7 @@
 						obj.render && (element = pReact.tmpl(obj.render(), obj._data));
 						if (element) {
 							//console.log(element, parent)
-							if (module.is(typeof element, "object") && "length" in element || module.is(typeof element, "array")) {
+							if (mod.is(typeof element, "object") && "length" in element || mod.is(typeof element, "array")) {
 								element.forEach((e) => {
 									toElements(e);
 								})
@@ -1104,14 +1104,14 @@
 						}
 						callback && callback();
 					};
-				module.is(obj._data, undefined) && (obj._data = {});
-				(!module.is(data, undefined) || module.isPlainObject(data)) && module.extend(obj._data, data);
+				mod.is(obj._data, undefined) && (obj._data = {});
+				(!mod.is(data, undefined) || mod.isPlainObject(data)) && mod.extend(obj._data, data);
 				("getInitData" in obj) && (new Promise((resolve, reject) => {
 					obj.getInitData(resolve, reject)
 				}).then((result) => {
-					("length" in result) && /object|array/.test(typeof result) ? module.extend(obj._data, {
+					("length" in result) && /object|array/.test(typeof result) ? mod.extend(obj._data, {
 						data: result
-					}) : module.extend(obj._data, result);
+					}) : mod.extend(obj._data, result);
 					done(obj._data);
 				}, (e) => {
 					console.log(e);
@@ -1155,14 +1155,14 @@
 			while (i--) {
 				doc.createElement(e[i])
 			}
-			module.setFontSize(num);
+			mod.setFontSize(num);
 			pReact.on(window, "orientationchange resize", () => {
-				module.setFontSize(num);
+				mod.setFontSize(num);
 			});
 			return this;
 		},
 		getBaseFontSize(num) {
-			return window.baseFontSize || module.setFontSize(num);
+			return window.baseFontSize || mod.setFontSize(num);
 		},
 		loading() {
 			doc.body.setAttribute("hidden", "hidden");
@@ -1195,9 +1195,9 @@
 			let then = this;
 			pReact.loading();
 			var script = doc.getElementsByTagName("script");
-			(module.extend([], [...script])).forEach((e) => {
-				if (module.is(e.type, "text/pReact")) {
-					module.evalContent(module.translateContent(e.innerHTML));
+			(mod.extend([], [...script])).forEach((e) => {
+				if (mod.is(e.type, "text/pReact")) {
+					mod.evalContent(mod.translateContent(e.innerHTML));
 					e.parentNode.removeChild(e);
 				}
 			});
@@ -1218,12 +1218,12 @@
 			return then;
 		},
 		tmpl(html, data) {
-			return module.tmpl(html, data);
+			return mod.tmpl(html, data);
 		},
 		createDom() {
 			let args = arguments,
 				len = args.length,
-				tagName, attrs, arr = module.extend([], args);
+				tagName, attrs, arr = mod.extend([], args);
 			if (len < 2) return;
 			tagName = args[0];
 			attrs = args[1];
@@ -1233,14 +1233,14 @@
 				i += 1;
 				if (i > 2) childrens.push(r);
 			});
-			let element = module.is(tagName, "textNode") ? doc.createTextNode("") : module.is(tagName, "docmentfragment") ? doc.createDocumentFragment() : doc.createElement(tagName);
-			if (!module.is(tagName, "docmentfragment")) {
+			let element = mod.is(tagName, "textNode") ? doc.createTextNode("") : mod.is(tagName, "docmentfragment") ? doc.createDocumentFragment() : doc.createElement(tagName);
+			if (!mod.is(tagName, "docmentfragment")) {
 				element._props = {};
-				module.extend(element._props, module.extend(attrs, {
+				mod.extend(element._props, mod.extend(attrs, {
 					tagName: tagName
 				}));
-				module.mixElement(element);
-				module.state.elements.push(element);
+				mod.mixElement(element);
+				mod.state.elements.push(element);
 				var f = (v) => {
 					var val = [];
 					if (/\{+\s*([^<>}{,]+)\s*\}+/.test(v) && /\./.test(v)) {
@@ -1248,7 +1248,7 @@
 							if (b) {
 								var style = pReact.getStyle(b.split('.')[1]);
 								style && val.push(style);
-								if (val.length === 0) Reflect.has(module.Class, b.split('.')[0].toLowerCase()) && val.push(Reflect.get(Reflect.get(module.Class, b.split('.')[0].toLowerCase()), b.split('.')[1]));
+								if (val.length === 0) Reflect.has(mod.Class, b.split('.')[0].toLowerCase()) && val.push(Reflect.get(Reflect.get(mod.Class, b.split('.')[0].toLowerCase()), b.split('.')[1]));
 							}
 						});
 					}
@@ -1262,17 +1262,17 @@
 					switch (name) {
 						case "text":
 							v.forEach((sv) => {
-								if (module.is(typeof sv, "string") && module.is(element.nodeType, 3)) {
+								if (mod.is(typeof sv, "string") && mod.is(element.nodeType, 3)) {
 									element._text(sv);
-								} else if (module.is(typeof sv, "function")) {
+								} else if (mod.is(typeof sv, "function")) {
 									sv = sv();
-									if (module.is(typeof sv, "string")) {
+									if (mod.is(typeof sv, "string")) {
 										element._text(sv);
-									} else if (!module.is(sv.nodeType, undefined)) {
+									} else if (!mod.is(sv.nodeType, undefined)) {
 										element = sv;
 										var r = /\{+\s*([^<>}{,]+)\s*\}+/.exec(n);
 										if (r) {
-											module.setElementClass(element, r[1].split('.')[0])
+											mod.setElementClass(element, r[1].split('.')[0])
 										}
 									}
 								} else {
@@ -1286,14 +1286,14 @@
 							element._attr((/\{+\s*([^<>}{,]+)\s*\}+/.test(v.join('')) ? "data-" + name : name), v.join(''));
 							break;
 						case "html":
-							n = module.is(typeof n, "function") ? n() : n;
+							n = mod.is(typeof n, "function") ? n() : n;
 							element._html(n.nodeType ? n.innerHTML : n);
 							break;
 						case "class":
 							element._addClass(v.join(' '));
 							break;
 						case "handle":
-							module.bind(v.join(' '), element);
+							mod.bind(v.join(' '), element);
 							break;
 						default:
 							if (name == "style") {
@@ -1309,8 +1309,8 @@
 										name = "onclick";
 									}
 									a[name.replace("on", "")] = fn;
-									module.extend(element._props.handle, a);
-									module.bind(a, element);
+									mod.extend(element._props.handle, a);
+									mod.bind(a, element);
 								} else {
 									if (name == "style") {
 										element[name] && (element[name].cssText += sv);
@@ -1324,10 +1324,10 @@
 				}
 				element._childrens = childrens
 			} else {
-				module.mixElement(element);
+				mod.mixElement(element);
 			}
 			childrens.forEach((e) => {
-				if (module.is(typeof e, "function")) {
+				if (mod.is(typeof e, "function")) {
 					var items = e();
 					element.appendChild(items);
 				} else {
@@ -1337,10 +1337,15 @@
 			return element;
 		},
 		getStyle(name) {
-			return !Object.is(module.Styles[name], undefined) && module.Styles[name];
+			return !Object.is(mod.Styles[name], undefined) && mod.Styles[name];
 		}
 	});
-	pReact.ready();
+	if (typeof module === "object" && typeof module.exports === "object") {
+		module.exports = pReact;
+	} else {
+		win.pReact = pReact;
+		pReact.ready();
+	}
 })(this);
 pReact && (((pReact) => {
 	pReact.jsonp = (url, data, ops) => {
