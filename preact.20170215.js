@@ -982,21 +982,26 @@
 	};
 	pReact.extend = mod.extend;
 	pReact.extend(pReact, {
-		import (url) {
+		import (url, options) {
 			let promise = new Promise((resolve, reject) => {
 				let isCss = /\.css/.test(url),
 					dom = doc.createElement(isCss ? "link" : "script");
 				if (!isCss) {
 					dom.src = url;
 					dom.async = true;
-					dom.charset = "utf-8"
+					dom.charset = options && options.charset || "utf-8"
 				} else {
 					dom.rel = "stylesheet";
 					dom.href = url;
 				}
 				head.appendChild(dom);
+				if (options && options.timeout) {
+					dom.elementLoadSetTimeout = setTimeout(() => {
+						reject("timeout");
+					}, options.timeout)
+				}
 				pReact.on(dom, "load", function(e) {
-					if (!isCss) {
+					if (options && options.remove || !isCss) {
 						head.removeChild(dom);
 					}
 					resolve("success");
