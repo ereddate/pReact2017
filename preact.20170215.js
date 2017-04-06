@@ -1000,6 +1000,11 @@
 		},
 		eventData: []
 	};
+
+	String.prototype._tmpl = function(data){
+		return mod.tmpl(this, data);
+	};
+
 	pReact.extend = mod.extend;
 	pReact.extend(pReact, {
 		import (url, options) {
@@ -1009,7 +1014,8 @@
 				if (!isCss) {
 					dom.src = url;
 					dom.async = true;
-					dom.charset = options && options.charset || "utf-8"
+					dom.charset = options && options.charset || "utf-8";
+					dom.type = options && options.type || "text/javascript";
 				} else {
 					dom.rel = "stylesheet";
 					dom.href = url;
