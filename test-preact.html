@@ -2173,6 +2173,8 @@
 									<xinput title="time" type="time" value="" placeholder="Time..." name="time"></xinput>
 									<xinput title="range" type="range" value="" placeholder="Range..." name="range"></xinput>
 									<xinput title="tel" type="tel" value="" placeholder="Tel..." name="tel"></xinput>
+									<xinput title="imgfile" type="file" name="img" accept="image/*"></xinput>
+									<xinput title="videofile" type="file" name="video" accept="video/*"></xinput>
 								</div>
 								<div style={styles.xGroup}{styles.clearfix}>
 									<xradio title="option 1" value="1" name="xradio"></xradio>
@@ -2205,7 +2207,12 @@
 						}
 					},
 					render(){
-						return /color/.test(this._data.type) ? (
+						return  /file/.test(this._data.type) ? (
+							<div style={styles.xinput}>
+								<label style={styles.xinputTitle}>{{title}}</label>
+								<input style={styles.xinputInput} type="{{type}}" name="{{name}}" accept="{{accept}}" />
+							</div>
+						) : /color/.test(this._data.type) ? (
 							<div style={styles.xinput}>
 								<label style={styles.xinputTitle}>{{title}}</label>
 								<input style={styles.xinputInput}{styles.xinputInputAuto} type="{{type}}" value="{{value}}" placeholder="{{placeholder}}" name="{{name}}" />
