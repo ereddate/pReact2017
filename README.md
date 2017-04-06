@@ -431,3 +431,21 @@ Array.prototype._eq
 String.prototype._tmpl
 "<div>{{a}}</div>"._tmpl({a:1})  //<div>1</div>
 ```
+# 默认样式
+```
+默认flex样式（以下为保留字段）。
+基础：
+1) flexrow 横向排列
+2) flexcolumn 纵向排列
+
+以下配合flexrom使用：
+1) flexbottomcenter 底部居中
+2) flexbottomleft 底部居左
+3) flexbottomright 底部居右
+4) flextopcenter 顶部居中
+5) flextopleft 顶部居左
+6) flextopright 顶部居右
+7) flexaligncenter 居中
+
+请参照test-flex.html使用
+```
