@@ -422,3 +422,12 @@ _eq(index)
 选取带有指定索引值的元素
 
 ```
+# 原型扩展
+```
+写法与Element对象的私有方法相同
+Array.prototype._eq
+[1,2]._eq(0)  //1
+
+String.prototype._tmpl
+"<div>{{a}}</div>"._tmpl({a:1})  //<div>1</div>
+```
