@@ -964,7 +964,14 @@
 		Class: {},
 		Styles: {
 			flexrow: "display: flex; flex-flow: row; justify-content: space-between; ",
-			flexcolumn: "display: flex; flex-flow: column; justify-content: space-between; "
+			flexcolumn: "display: flex; flex-flow: column; justify-content: space-between; ",
+			flexbottomcenter: "-webkit-flex-wrap: nowrap;-ms-flex-wrap: nowrap;flex-wrap: nowrap;-webkit-justify-content: center;-ms-flex-pack: center;justify-content: center;-webkit-align-items: flex-end;-ms-flex-align: end;align-items: flex-end;",
+			flexbottomleft: "-webkit-flex-wrap: nowrap;-ms-flex-wrap: nowrap;flex-wrap: nowrap;-webkit-justify-content: flex-start;-ms-flex-pack: start;justify-content: flex-start;-webkit-align-items: flex-end;-ms-flex-align: end;align-items: flex-end;",
+			flexbottomright: "-webkit-flex-wrap: nowrap;-ms-flex-wrap: nowrap;flex-wrap: nowrap;-webkit-justify-content: flex-end;-ms-flex-pack: end;justify-content: flex-end;-webkit-align-items: flex-end;-ms-flex-align: end;align-items: flex-end;",
+			flextopcenter: "-webkit-flex-wrap: nowrap;-ms-flex-wrap: nowrap;flex-wrap: nowrap;-webkit-justify-content: center;-ms-flex-pack: center;justify-content: center;-webkit-align-items: flex-start;-ms-flex-align: start;align-items: flex-start;",
+			flextopleft: "-webkit-flex-wrap: nowrap;-ms-flex-wrap: nowrap;flex-wrap: nowrap;-webkit-justify-content: flex-start;-ms-flex-pack: start;justify-content: flex-start;-webkit-align-items: flex-start;-ms-flex-align: start;align-items: flex-start;",
+			flextopright: "-webkit-flex-wrap: nowrap;-ms-flex-wrap: nowrap;flex-wrap: nowrap; -webkit-justify-content: flex-end;-ms-flex-pack: end;justify-content: flex-end;-webkit-align-items: flex-start;-ms-flex-align: start;align-items: flex-start;",
+			flexaligncenter: "-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;"
 		},
 		trim(str) {
 			return str.replace(/(^\s*)|(\s*$)/g, "");

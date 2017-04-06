@@ -25,16 +25,21 @@
 						margin:(5/baseFontSize).toFixed(4)+"rem",
 						background:"rgb(100,149,237)"
 					},
+					itemrowa:{
+						width:(30/baseFontSize).toFixed(4)+"rem",
+						margin:(5/baseFontSize).toFixed(4)+"rem",
+						background:"rgb(100,149,237)"
+					},
 					itemcolumn:{
 						width:((screen.width-10)/baseFontSize).toFixed(4)+"rem",
 						margin:(5/baseFontSize).toFixed(4)+"rem",
 						height:(50/baseFontSize).toFixed(4)+"rem",
 						background:"rgb(255,215,0)"
 					},
-					rowfull:{
-						height:(300/baseFontSize).toFixed(4)+"rem"
+					rowheightfull:{
+						height:(200/baseFontSize).toFixed(4)+"rem"
 					},
-					itemrowfull:{
+					itemrowheightfull:{
 						height:"auto"
 					},
 					a:{
@@ -65,6 +70,16 @@
 						</div>
 					)
 				}
+			}),demoa = pReact.createClass("demoa", {
+				render(){
+					return (
+						<div data-style="{{main}}">
+							<div style={styles.a} data-style="{{item}}"></div>
+							<div style={styles.b} data-style="{{item}}"></div>
+							<div style={styles.c} data-style="{{item}}"></div>
+						</div>
+					)
+				}
 			});
 			pReact.renderDom(
 				<demo main={styles.flexrow} item={styles.itemrow} />,
@@ -75,9 +90,38 @@
 				document.getElementById("page")
 			);
 			pReact.renderDom(
-				<demo main={styles.flexrow}{styles.rowfull} item={styles.itemrow}{styles.itemrowfull} />,
+				<demo main={styles.flexrow}{styles.rowheightfull} item={styles.itemrow}{styles.itemrowheightfull} />,
 				document.getElementById("page")
 			);
+			pReact.renderDom(
+				<demoa main={styles.flexrow}{styles.flexaligncenter}{styles.rowheightfull} item={styles.itemrow} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demoa main={styles.flexrow}{styles.flextopcenter}{styles.rowheightfull} item={styles.itemrow} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demoa main={styles.flexrow}{styles.flexbottomcenter}{styles.rowheightfull} item={styles.itemrow} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demoa main={styles.flexrow}{styles.flextopleft}{styles.rowheightfull} item={styles.itemrowa} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demoa main={styles.flexrow}{styles.flextopright}{styles.rowheightfull} item={styles.itemrowa} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demoa main={styles.flexrow}{styles.flexbottomleft}{styles.rowheightfull} item={styles.itemrowa} />,
+				document.getElementById("page")
+			);
+			pReact.renderDom(
+				<demoa main={styles.flexrow}{styles.flexbottomright}{styles.rowheightfull} item={styles.itemrowa} />,
+				document.getElementById("page")
+			);
+
 			console.log(pReact.findNode("div:first"));
 		</script>
 	</body>
