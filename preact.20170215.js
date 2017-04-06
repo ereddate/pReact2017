@@ -102,10 +102,12 @@
 				return elem.tagName && elem.tagName.toLowerCase() == "iframe" ? elem.contentDocument || elem.contentWindow.document : elem.childNodes && [...elem.childNodes] || [];
 			},
 			_empty() {
-				mod.toggle(this, (element) => {
+				let element = this;
+				mod.toggle(element, (end) => {
 					[...element.childNodes].forEach((e) => {
 						e._remove();
-					})
+					});
+					end();
 				});
 				return this;
 			},
@@ -115,9 +117,14 @@
 			},
 			_attr(name, value) {
 				var then = this;
-				return !mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
-					element.setAttribute(e.name, e.value);
-				}) || !mod.is(typeof value, "undefined") && then.setAttribute(name, value) || then.getAttribute(name);
+				if (typeof value != "undefined")
+					!mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
+						then.setAttribute(e.name, e.value);
+					}) || !mod.is(typeof value, "undefined") && then.setAttribute(name, value);
+				else {
+					return then.getAttribute(name);
+				}
+				return this;
 			},
 			_children(selector) {
 				if (selector) {
@@ -160,15 +167,17 @@
 			_html(value) {
 				let then = this;
 				if (typeof value != "boolean") {
-					if (typeof value == "string") {
-						then.innerHTML = value;
-					} else if (value.nodeType) {
-						then._append(value);
-					} else if (typeof value == "function") {
-						then._html(value());
-					} else {
-						return then;
-					}
+					mod.toggle(then, (end) => {
+						if (typeof value == "string") {
+							then.innerHTML = value;
+						} else if (value.nodeType) {
+							then._append(value);
+						} else if (typeof value == "function") {
+							then._html(value());
+						}
+						end();
+					});
+					return then;
 				} else if (value === true) {
 					return then.outerHTML;
 				} else {
@@ -666,9 +675,13 @@
 			mod.animateFade(list, styles, time, timingFunction, callback, transitionKey);
 		},
 		toggle(element, callback) {
-			element && (element.style.visibility = "hidden");
-			callback && callback(element);
-			element && (element.style.visibility = "visible");
+			let promise = new Promise((resolve, reject) => {
+				element.style.visibility = "hidden";
+				callback && callback.call(element, resolve) || resolve();
+			});
+			promise.then(() => {
+				element.style.visibility = "visible";
+			});
 		},
 		map(elems, callback, arg) {
 			let ret = [],
@@ -729,8 +742,9 @@
 			mod.setElementClass(element, oldElement._factory);
 			mod.setElementData(element, oldElement._data);
 			var parent = oldElement.parentNode;
-			mod.toggle(parent, () => {
+			mod.toggle(parent, (end) => {
 				parent && parent.replaceChild(element, oldElement);
+				end();
 			});
 		},
 		findNode(element, selector) {
