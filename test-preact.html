@@ -172,6 +172,7 @@
 	</head>
 	<body>
 		<div id="page"></div>
+		<script src="preact-extend-canvasdraw.js"></script>
 		<script>
 			//pReact.toAmp();
 		</script>
@@ -1091,6 +1092,13 @@
 						border:0,
 						width:(screen.width/baseFontSize).toFixed(4)+"rem",
 						height:((document.documentElement.clientHeight)/baseFontSize).toFixed(4)+"rem"
+					},
+					canvasbox:{
+						padding:(10/baseFontSize).toFixed(4)+"rem 0",
+						background:"rgb(255,255,255)"
+					},
+					canvasbox_content:{
+						margin:"0 auto"
 					}
 				}),
 				tools = pReact.createClass("tools", {
@@ -1721,6 +1729,9 @@
 									<div id="listview" class="item"></div>
 									<div id="service" class="item"></div>
 									<div id="progress" class="item"></div>
+									<div class="item">
+										<div style={styles.canvasbox} id="canvas"></div>
+									</div>
 									<div id="form">
 										<xform action="" target="_blank" name="xform"></xform>
 									</div>
@@ -2679,6 +2690,53 @@
 													<progress value="1%" />,
 													document.getElementById("progress"),
 													(() => {
+														pReact.canvasDraw("#canvas", {
+															width:screen.width - 20,
+															height:200,
+															style: pReact.getStyle("canvasbox_content")
+														}).setData(function(canvas){
+															var i, len = 5, data = [];
+															for (i=0;i<len;i++) i>0 && data.push({
+																from: [0, canvas.height / len * i],
+																to: [canvas.width, canvas.height / len * i]
+															});
+															return data;
+														}).clearRect().drawDashLine("lightgrey", 1, "left").setData(function(canvas){
+															var i, len = 5, data = [];
+															for (i=0;i<len;i++) i>0 && i<len && data.push({
+																from: [canvas.width / len * i, 0],
+																to: [canvas.width / len * i, canvas.height]
+															});
+															return data;
+														}).drawLine("lightgrey", 1).drawViewLine("lightgrey", 1).setData(function(canvas){
+															return [];
+														}).drawLine("red", 1).drawString("pReact canvasDraw test", 10, 20, "left").drawArcLoad(60, 60, 100, "powder", 25).drawArcLoad(60, 120, 70, "green", 25).drawArcLoad(120, 120, 30, "blue", 25).drawARC(180, 60, 30, "blue").setData(function(canvas){
+															return [{
+																from: [58.054545454545455,15],
+																to: [66.49090909090907,15]
+															},{
+																from: [66.49090909090907,15],
+																to: [80.19999999999989,35]
+															},{
+																from: [80.19999999999989,35],
+																to: [99.18181818181795,65]
+															},{
+																from: [99.18181818181795,65],
+																to: [147.6909090909088,15]
+															},{
+																from: [147.6909090909088,15],
+																to: [181.43636363636358,25]
+															},{
+																from: [181.43636363636358,25],
+																to: [213.07272727272743,85]
+															},{
+																from: [213.07272727272743,85],
+																to: [224.6727272727275,15]
+															},{
+																from: [224.6727272727275,15],
+																to: [285.6727272727275,155]
+															}];
+														}).drawCurve("red", 3);
 														done()
 													})
 												)

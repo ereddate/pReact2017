@@ -1,5 +1,5 @@
 /*!
- * pReact & pjs template v1.0.0
+ * pReact & pjs template v2.0.0
  * @author yandong
  *
  * https://github.com/ereddate/pReact2017
