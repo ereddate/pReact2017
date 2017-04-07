@@ -273,6 +273,9 @@ touch
    
   tap(element, callback)
   touch tap点击，callback会返回值的第二个值是TAP类型是单击（singleTap）还是双击（doubleTap）及第三个值间隔时间
+
+canvasDraw
+  canvas绘图
   
 ```
 # Element对象私有方法，支持伪类选择器（例如："div:contents","div:parents","div:children","div:text"等等）。
@@ -363,6 +366,9 @@ _toggleClass(name)
 
 _hasClass(name)
 判断是否包含指定样式名
+
+_length(bool)
+获取子节点的长度，bool等于true返回childNodes.length，否则返回children.length
 
 _width(value)
 宽度，value等于true，将返回包含margin\padding\border的值

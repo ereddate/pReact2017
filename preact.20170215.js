@@ -94,6 +94,9 @@
 				});
 				return result;
 			},
+			_length(bool) {
+				return bool ? this.childNodes.length : this._children().length;
+			},
 			_map(callback, arg) {
 				return mod.map(this._children(), callback, arg);
 			},
@@ -523,7 +526,7 @@
 										})) : a.value;
 								})
 							}
-							e.childNodes.length > 0 && f(e.childNodes);
+							e._length(true) > 0 && f(e.childNodes);
 							//console.log(pReact.Class[e.tagName.toLowerCase()].render.toString())
 							e._remove();
 							pReact.renderDom(
@@ -1008,7 +1011,7 @@
 		eventData: []
 	};
 
-	String.prototype._tmpl = function(data){
+	String.prototype._tmpl = function(data) {
 		return mod.tmpl(this, data);
 	};
 
