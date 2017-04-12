@@ -427,6 +427,12 @@ _last()
 _eq(index)
 选取带有指定索引值的元素
 
+_val(value)
+设置或获取节点的value属性值
+
+_bindElement
+双向绑定的节点
+
 ```
 # 原型扩展
 ```
@@ -454,4 +460,25 @@ String.prototype._tmpl
 7) flexaligncenter 居中
 
 请参照test-flex.html使用
+```
+# 节点的双向绑定
+```
+属性：
+p-bind 绑定名称
+p-for 连接绑定名称
+
+使用：
+...
+handleButtonClearClick(e){
+  this._bindElement._html(0)
+},
+...
+render(){
+  ...
+    <h1 p-bind="count">0</h1>
+    <button p-for="count" onclick={handleButtonAddClick}>增加</button>
+    <button p-for="count" onclick={handleButtonRemoveClick}>减少</button>
+    <button p-for="count" onclick={handleButtonClearClick}>清零</button>
+  ...
+}
 ```
