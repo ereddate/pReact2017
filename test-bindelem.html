@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="preact.20170215.js"></script>
+		<style>
+			body {
+				background: #f4f5f7;
+				font-family: 微软雅黑;
+			}
+			body, ul, p {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="page"></div>
+		<script type="text/pReact">
+			let bindElement = pReact.createClass("bindelement", {
+				handleButtonAddClick(e){
+					let a = parseFloat(this._bindElement._text());
+					a+=1;
+					a = a>9 ? 9 : a;
+					this._bindElement._html(a)
+				},
+				handleButtonRemoveClick(e){
+					let a = parseFloat(this._bindElement._text());
+					a-=1;
+					a = a<0 ? 0 : a;
+					this._bindElement._html(a)
+				},
+				handleButtonClearClick(e){
+					this._bindElement._html(0)
+				},
+				handleInputKeyUp(e){
+					this._bindElement._val(this.value);
+				},
+				handleButtonToFormClick(e){
+					this._bindElement.submit();
+				},
+				handleSelectChange(e){
+					this._bindElement._val(this.value);
+				},
+				render(){
+					return (
+						<div>
+							<h1 p-bind="count">0</h1>
+							<button p-for="count" onclick={handleButtonAddClick}>增加</button>
+							<button p-for="count" onclick={handleButtonRemoveClick}>减少</button>
+							<button p-for="count" onclick={handleButtonClearClick}>清零</button>
+							<form action="" p-bind="form">
+								<h1 p-bind="text"></h1>
+								<input p-for="text" name="user" onkeyup={handleInputKeyUp} />
+								<h1 p-bind="select"></h1>
+								<select p-for="select" name="index" onchange={handleSelectChange}>
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+								</select>
+								<button p-for="form" onclick={handleButtonToFormClick}>submit</button>
+							</form>
+						</div>
+					)
+				}
+			});
+			pReact.renderDom(
+				<bindElement />,
+				document.getElementById("page")
+			)
+		</script>
+	</body>
+</html>

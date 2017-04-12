@@ -173,19 +173,35 @@
 					mod.toggle(then, (end) => {
 						if (typeof value == "string") {
 							then.innerHTML = value;
-						} else if (value.nodeType) {
+						} else if (value && value.nodeType) {
 							then._append(value);
 						} else if (typeof value == "function") {
 							then._html(value());
+						} else {
+							then.innerHTML = value;
 						}
 						end();
 					});
 					return then;
 				} else if (value === true) {
 					return then.outerHTML;
-				} else {
-					return then.innerHTML;
 				}
+				return then.innerHTML;
+			},
+			_val(value) {
+				//console.log(value)
+				if (Reflect.has(this, "value")) {
+					if (value) {
+						this.value = value;
+					}else {
+						return this.value;
+					}
+				} else if (typeof value != "undefined") {
+					this._html(value);
+				} else {
+					return this._html();
+				}
+				return this;
 			},
 			_clone(bool) {
 				let nE = this.cloneNode(!mod.is(typeof bool, "undefined") ? bool : true);
@@ -492,6 +508,10 @@
 			return content;
 		},
 		tmpl(element, data, obj) {
+			let bindAttrElement = {
+				bind: {},
+				for: {}
+			};
 			var f = (element) => {
 					element && (Reflect.has(element, "length") ? Object.is(element.nodeType, 11) ? [...element.childNodes] : [...element] : [element]).forEach((e) => {
 						//console.log(e)
@@ -551,6 +571,11 @@
 												e.setAttribute(a.name, a.value.replace(reg, data[name]));
 											}
 										}
+									}
+									if (/^p-/.test(a.name.toLowerCase())) {
+										e._removeAttr(a.name)
+										let belem = bindAttrElement[a.name.toLowerCase().replace("p-", "") == "for" ? "bind" : "for"];
+										!belem[a.value] ? belem[a.value] = [e] : belem[a.value].push(e);
 									}
 									if (/data\-src/.test(a.name.toLowerCase()) || /data\-poster/.test(a.name.toLowerCase()))
 										(e.setAttribute(a.name.toLowerCase().replace("data-", ""), /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
@@ -614,6 +639,17 @@
 				}))
 			} else {
 				f(element);
+				for (let name in bindAttrElement.bind) {
+					let e = bindAttrElement.bind[name];
+					pReact.each(e, (i, elem) => {
+						if (bindAttrElement.for[name]) {
+							let f = bindAttrElement.for[name];
+							pReact.each(f, (n, felem) => {
+								elem._bindElement = felem;
+							})
+						}
+					})
+				}
 			}
 			return element;
 		},
@@ -1843,7 +1879,7 @@ pReact && (((pReact) => {
 		if (settings.headers)
 			for (name in settings.headers) setHeader(name, settings.headers[name])
 		xhr.setRequestHeader = setHeader
-		console.log(headers)
+		//console.log(headers)
 		var nativeSetHeader = xhr.setRequestHeader,
 			abortTimeout;
 		xhr.onreadystatechange = function() {
@@ -1871,10 +1907,10 @@ pReact && (((pReact) => {
 		var async = 'async' in settings ? settings.async : true
 		xhr.open(settings.type, settings.url, async, settings.username, settings.password)
 		for (let name in headers) {
-			console.log(name, headers[name]);
+			//console.log(name, headers[name]);
 			nativeSetHeader.apply(xhr, headers[name]);
 		}
-		console.log(xhr)
+		//console.log(xhr)
 		if (settings.timeout > 0) abortTimeout = setTimeout(function() {
 			xhr.onreadystatechange = empty
 			xhr.abort()
