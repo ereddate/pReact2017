@@ -461,7 +461,7 @@ String.prototype._tmpl
 
 请参照test-flex.html使用
 ```
-# 节点的双向绑定
+# 双向绑定
 ```
 属性：
 p-bind 绑定名称
