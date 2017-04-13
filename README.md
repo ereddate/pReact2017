@@ -477,9 +477,9 @@ handleButtonClearClick(e){
 render(){
   ...
     <h1 p-bind="count">0</h1>
-    <h2 p-bind="count_a">0</h2>
+    <h2 p-bind="count_a" p-for="count">0</h2>
     ...
-    <button p-for="count count_a ..." onclick={handleButtonAddClick}>增加</button>
+    <button p-for="count_a ..." onclick={handleButtonAddClick}>增加</button>
     <button p-for="count" onclick={handleButtonRemoveClick}>减少</button>
     <button p-for="count count_a ..." onclick={handleButtonClearClick}>清零</button>
   ...
