@@ -463,6 +463,7 @@ String.prototype._tmpl
 ```
 # 双向绑定
 ```
+支持一节点绑定多个节点，并赋给节点的 _bindElement (数组)。
 属性：
 p-bind 绑定名称
 p-for 连接绑定名称
@@ -476,9 +477,11 @@ handleButtonClearClick(e){
 render(){
   ...
     <h1 p-bind="count">0</h1>
-    <button p-for="count" onclick={handleButtonAddClick}>增加</button>
+    <h2 p-bind="count_a">0</h2>
+    ...
+    <button p-for="count count_a ..." onclick={handleButtonAddClick}>增加</button>
     <button p-for="count" onclick={handleButtonRemoveClick}>减少</button>
-    <button p-for="count" onclick={handleButtonClearClick}>清零</button>
+    <button p-for="count count_a ..." onclick={handleButtonClearClick}>清零</button>
   ...
 }
 ```
