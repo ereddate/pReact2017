@@ -75,6 +75,11 @@
 				auxDiv.style.msTransition !== undefined ? 'msTransition' : undefined
 			)
 		),
+		_instanceOf = (_constructor) => {
+			return function(o) {
+				return (o instanceof _constructor);
+			};
+		},
 		pSubClass = {
 			_set(options) {
 				var then = this;
@@ -173,7 +178,7 @@
 					mod.toggle(then, (end) => {
 						if (typeof value == "string") {
 							then.innerHTML = value;
-						} else if (value && value.nodeType) {
+						} else if (typeof value != "undefined" && value.nodeType) {
 							then._append(value);
 						} else if (typeof value == "function") {
 							then._html(value());
@@ -189,9 +194,8 @@
 				return then.innerHTML;
 			},
 			_val(value) {
-				//console.log(value)
 				if (Reflect.has(this, "value")) {
-					if (value) {
+					if (typeof value != "undefined") {
 						this.value = value;
 					}else {
 						return this.value;
@@ -579,17 +583,18 @@
 										vname.forEach((n) => {
 											!belem[n] ? belem[n] = [e] : belem[n].push(e);
 										})
+									}else{
+										if (/data\-src/.test(a.name.toLowerCase()) || /data\-poster/.test(a.name.toLowerCase()))
+											(e.setAttribute(a.name.toLowerCase().replace("data-", ""), /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
+												return g(a, b, e);
+											}))) : a.value), e._removeAttr("data-src data-poster"));
+										else if (/data-style/.test(a.name.toLowerCase()))
+											(e.setAttribute(a.name.toLowerCase().replace("data-", ""), (e.getAttribute(a.name.toLowerCase().replace("data-", "")) || "") + a.value), e._removeAttr("data-style"));
+										else
+											e.setAttribute(a.name, /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
+												return g(a, b, e);
+											}))) : a.value);
 									}
-									if (/data\-src/.test(a.name.toLowerCase()) || /data\-poster/.test(a.name.toLowerCase()))
-										(e.setAttribute(a.name.toLowerCase().replace("data-", ""), /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
-											return g(a, b, e);
-										}))) : a.value), e._removeAttr("data-src data-poster"));
-									else if (/data-style/.test(a.name.toLowerCase()))
-										(e.setAttribute(a.name.toLowerCase().replace("data-", ""), (e.getAttribute(a.name.toLowerCase().replace("data-", "")) || "") + a.value), e._removeAttr("data-style"));
-									else
-										e.setAttribute(a.name, /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
-											return g(a, b, e);
-										}))) : a.value);
 								})
 							}
 							["text", "nodeValue"].forEach((text) => {
@@ -744,25 +749,22 @@
 		},
 		has(target, obj) {
 			var hasIn = false;
-			switch (typeof target) {
-				case "string":
-					let reg = new RegExp(obj, "gim");
-					return reg.test(target)
-					break;
-				case "array":
-					var i = 0;
-					target.forEach((t) => {
-						i += 1;
-						if (t === obj) hasIn = i;
-					})
-					return hasIn;
-					break;
-				case "object":
-					for (let name in target) {
-						if (typeof obj == "object" && target[name] == obj[name] || typeof obj == "string" && name == obj) hasIn = name;
-					}
-					return hasIn;
-					break;
+
+			if ((Array.isArray || _instanceOf(Array))(target)) {
+				var i = -1;
+				target.forEach((t) => {
+					if (t === obj) hasIn = i+1;
+					i += 1;
+				});
+				return hasIn;
+			} else if (_instanceOf(String)) {
+				let reg = new RegExp(obj, "gim");
+				return reg.test(target);
+			} else {
+				for (let name in target) {
+					if (typeof obj == "object" && target[name] == obj[name] || typeof obj == "string" && name == obj) hasIn = name;
+				}
+				return hasIn;
 			}
 			return hasIn;
 		},
