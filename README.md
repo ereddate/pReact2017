@@ -463,7 +463,7 @@ String.prototype._tmpl
 ```
 # 双向绑定
 ```
-支持一节点绑定多个节点，并赋给节点的 _bindElement (数组)。
+支持节点间绑定，并赋给节点的 _bindElement (数组)。
 属性：
 p-bind 绑定名称
 p-for 连接绑定名称
