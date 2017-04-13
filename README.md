@@ -471,7 +471,7 @@ p-for 连接绑定名称
 使用：
 ...
 handleButtonClearClick(e){
-  this._bindElement._html(0)
+  this._bindElement[0]._html(0)
 },
 ...
 render(){
