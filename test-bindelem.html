@@ -20,36 +20,46 @@
 		<script type="text/pReact">
 			let bindElement = pReact.createClass("bindelement", {
 				handleButtonAddClick(e){
-					let a = parseFloat(this._bindElement._text());
-					a+=1;
-					a = a>9 ? 9 : a;
-					this._bindElement._html(a)
+					let that = this;
+					that._bindElement.forEach((elem) => {
+						let a = parseFloat(elem._text());
+						a+=1;
+						a = a>9 ? 9 : a;
+						elem._html(a)
+					})
 				},
 				handleButtonRemoveClick(e){
-					let a = parseFloat(this._bindElement._text());
-					a-=1;
-					a = a<0 ? 0 : a;
-					this._bindElement._html(a)
+					let that = this;
+					that._bindElement.forEach((elem) => {
+						let a = parseFloat(elem._text());
+						a-=1;
+						a = a<0 ? 0 : a;
+						elem._html(a)
+					})
 				},
 				handleButtonClearClick(e){
-					this._bindElement._html(0)
+					let that = this;
+					that._bindElement.forEach((elem) => {
+						elem._html(0)
+					})
 				},
 				handleInputKeyUp(e){
-					this._bindElement._val(this.value);
+					this._bindElement[0]._val(this.value);
 				},
 				handleButtonToFormClick(e){
-					this._bindElement.submit();
+					this._bindElement[0].submit();
 				},
 				handleSelectChange(e){
-					this._bindElement._val(this.value);
+					this._bindElement[0]._val(this.value);
 				},
 				render(){
 					return (
 						<div>
 							<h1 p-bind="count">0</h1>
-							<button p-for="count" onclick={handleButtonAddClick}>增加</button>
-							<button p-for="count" onclick={handleButtonRemoveClick}>减少</button>
-							<button p-for="count" onclick={handleButtonClearClick}>清零</button>
+							<h2 p-bind="count_a">0</h2>
+							<button p-for="count count_a" onclick={handleButtonAddClick}>增加</button>
+							<button p-for="count count_a" onclick={handleButtonRemoveClick}>减少</button>
+							<button p-for="count count_a" onclick={handleButtonClearClick}>清零</button>
 							<form action="" p-bind="form">
 								<h1 p-bind="text"></h1>
 								<input p-for="text" name="user" onkeyup={handleInputKeyUp} />

@@ -574,8 +574,11 @@
 									}
 									if (/^p-/.test(a.name.toLowerCase())) {
 										e._removeAttr(a.name)
-										let belem = bindAttrElement[a.name.toLowerCase().replace("p-", "") == "for" ? "bind" : "for"];
-										!belem[a.value] ? belem[a.value] = [e] : belem[a.value].push(e);
+										let belem = bindAttrElement[a.name.toLowerCase().replace("p-", "") == "for" ? "bind" : "for"],
+											vname = a.value.split(' ');
+										vname.forEach((n) => {
+											!belem[n] ? belem[n] = [e] : belem[n].push(e);
+										})
 									}
 									if (/data\-src/.test(a.name.toLowerCase()) || /data\-poster/.test(a.name.toLowerCase()))
 										(e.setAttribute(a.name.toLowerCase().replace("data-", ""), /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
@@ -645,7 +648,7 @@
 						if (bindAttrElement.for[name]) {
 							let f = bindAttrElement.for[name];
 							pReact.each(f, (n, felem) => {
-								elem._bindElement = felem;
+								!elem._bindElement ? elem._bindElement = [felem] : elem._bindElement.push(felem);
 							})
 						}
 					})
