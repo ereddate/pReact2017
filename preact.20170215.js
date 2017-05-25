@@ -69,7 +69,16 @@
 	Array.prototype._eq = function(index) {
 		return index < 0 ? this[this.length + index] : this[index];
 	};
-	let auxDiv = document.createElement('div'),
+	let watcher = function(elem, name, value) {
+			elem._bindElement && elem._bindElement.forEach((e) => {
+				if (Reflect.has(e.attributes, name)) e._attr(name, value);
+				else if (Reflect.has(e, name)) /input|select/.test(e.tagName.toLowerCase()) && typeof value == "string" ? e._val(value) : e[name] = value;
+				else {
+					e._text(value);
+				}
+			})
+		},
+		auxDiv = document.createElement('div'),
 		transitionKey = auxDiv.style.webkitTransition !== undefined ? 'webkitTransition' : (
 			auxDiv.style.mozTransition !== undefined ? 'mozTransition' : (
 				auxDiv.style.msTransition !== undefined ? 'msTransition' : undefined
@@ -128,7 +137,8 @@
 				if (typeof value != "undefined")
 					!mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
 						then.setAttribute(e.name, e.value);
-					}) || !mod.is(typeof value, "undefined") && then.setAttribute(name, value);
+						watcher(then, e.name, e.value);
+					}) || !mod.is(typeof value, "undefined") && (then.setAttribute(name, value), watcher(then, name, value));
 				else {
 					return then.getAttribute(name);
 				}
@@ -152,24 +162,26 @@
 					nodeType = then.nodeType;
 				if (nodeType) {
 					if ((nodeType === 1 || nodeType === 9 || nodeType === 11) && typeof then.textContent === "string") {
-						if (value) {
+						if (typeof value != "undefined") {
 							then.textContent = value;
+							watcher(then, "textContent", value);
 							return this;
 						} else {
 							return then.textContent;
 						}
 					} else if (nodeType === 3 || nodeType === 4) {
-						if (value) {
+						if (typeof value != "undefined") {
 							then.nodeValue = value;
+							watcher(then, "nodeValue", value);
 							return this;
 						} else {
 							return then.nodeValue;
 						}
 					} else {
-						return value ? this : "";
+						return typeof value != "undefined" ? this : "";
 					}
 				} else {
-					return value ? this : "";
+					return typeof value != "undefined" ? this : "";
 				}
 			},
 			_html(value) {
@@ -178,12 +190,14 @@
 					mod.toggle(then, (end) => {
 						if (typeof value == "string") {
 							then.innerHTML = value;
+							watcher(then, "innerHTML", value);
 						} else if (typeof value != "undefined" && value.nodeType) {
 							then._append(value);
 						} else if (typeof value == "function") {
 							then._html(value());
 						} else {
 							then.innerHTML = value;
+							watcher(then, "innerHTML", value);
 						}
 						end();
 					});
@@ -196,8 +210,8 @@
 			_val(value) {
 				if (Reflect.has(this, "value")) {
 					if (typeof value != "undefined") {
-						this.value = value;
-					}else {
+						this._attr("value", value);
+					} else {
 						return this.value;
 					}
 				} else if (typeof value != "undefined") {
@@ -530,11 +544,12 @@
 										let reg = new RegExp("{{\\s*" + name.toLowerCase() + "\\s*(\\|\\s*([^<>,]+)\\s*)*}}", "gim"),
 											v = reg.exec(a.value.toLowerCase());
 										if (v) {
+											let u = Object.is(typeof data[name], "function") ? data[name]() : data[name];
 											if (v[2]) {
 												v = v[2].split(':');
-												pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && (options[a.name] = pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](data[name], v[1]));
+												pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && (options[a.name] = pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](u, v[1]));
 											} else {
-												options[a.name] = a.value.replace(reg, data[name])
+												options[a.name] = a.value.replace(reg, u)
 											}
 										}
 									}
@@ -568,11 +583,12 @@
 										let reg = new RegExp("{{\\s*" + name.toLowerCase() + "\\s*(\\|\\s*([^<>,]+)\\s*)*}}", "gim"),
 											v = reg.exec(a.value.toLowerCase());
 										if (v) {
+											let u = Object.is(typeof data[name], "function") ? data[name]() : data[name];
 											if (v[2]) {
 												v = v[2].split(':');
-												pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && e.setAttribute(a.name, pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](data[name], v[1]));
+												pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && e.setAttribute(a.name, pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](u, v[1]));
 											} else {
-												e.setAttribute(a.name, a.value.replace(reg, data[name]));
+												e.setAttribute(a.name, a.value.replace(reg, u));
 											}
 										}
 									}
@@ -583,7 +599,7 @@
 										vname.forEach((n) => {
 											!belem[n] ? belem[n] = [e] : belem[n].push(e);
 										})
-									}else{
+									} else {
 										if (/data\-src/.test(a.name.toLowerCase()) || /data\-poster/.test(a.name.toLowerCase()))
 											(e.setAttribute(a.name.toLowerCase().replace("data-", ""), /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
 												return g(a, b, e);
@@ -602,8 +618,9 @@
 									for (let name in data) {
 										a = a.replace(new RegExp("{{\\s*" + name + "\\s*(\\|\\s*([^<>,]+)\\s*)*}}", "gim"), ((a, b, c) => {
 											if (c) {
-												let v = c.split(':');
-												return pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](data[name], v[1]) || data[name];
+												let v = c.split(':'),
+													u = Object.is(typeof data[name], "function") ? data[name]() : data[name];
+												return pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](u, v[1]) || u;
 											}
 											return data[name];
 										}))
@@ -634,8 +651,9 @@
 					for (let name in data) {
 						a = a.replace(new RegExp("{{\\s*" + name + "\\s*(\\|\\s*([^<>,]+)\\s*)*}}", "gim"), ((a, b, c) => {
 							if (c) {
-								let v = c.split(':');
-								return pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](data[name], v[1]) || data[name];
+								let v = c.split(':'),
+									u = Object.is(typeof data[name], "function") ? data[name]() : data[name];
+								return pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")] && pReact.tmplThesaurus[v[0].replace(/\s+/gim, "")](u, v[1]) || u;
 							}
 							return data[name];
 						}))
@@ -753,7 +771,7 @@
 			if ((Array.isArray || _instanceOf(Array))(target)) {
 				var i = -1;
 				target.forEach((t) => {
-					if (t === obj) hasIn = i+1;
+					if (t === obj) hasIn = i + 1;
 					i += 1;
 				});
 				return hasIn;
@@ -1884,7 +1902,7 @@ pReact && (((pReact) => {
 		if (settings.headers)
 			for (name in settings.headers) setHeader(name, settings.headers[name])
 		xhr.setRequestHeader = setHeader
-		//console.log(headers)
+			//console.log(headers)
 		var nativeSetHeader = xhr.setRequestHeader,
 			abortTimeout;
 		xhr.onreadystatechange = function() {
