@@ -26,7 +26,7 @@
 						a+=1;
 						a = a>9 ? 9 : a;
 						elem._val(a);
-						/*elem._trigger("change")*/
+						elem._trigger("change")
 					})
 				},
 				handleButtonRemoveClick(e){
@@ -45,16 +45,16 @@
 					})
 				},
 				handleInputKeyUp(e){
-					this._val(this.value);
+					this._bindElement[0]._val(this.value);
 				},
 				handleButtonToFormClick(e){
 					this._bindElement[0].submit();
 				},
 				handleSelectChange(e){
-					this._val(this.value);
+					this._bindElement[0]._val(this.value);
 				},
 				handleInputChange(e){
-					/*this._bindElement[0]._html(this.value);*/
+					this._bindElement[0]._html(this.value);
 				},
 				render(){
 					return (
@@ -62,12 +62,12 @@
 							<h1 p-bind="count">0</h1>
 							<input type="text" p-bind="count_a" p-for="count" onchange={handleInputChange} value="0" />
 							<button p-for="count_a" onclick={handleButtonAddClick}>增加</button>
-							<button p-for="count_a" onclick={handleButtonRemoveClick}>减少</button>
-							<button p-for="count_a" onclick={handleButtonClearClick}>清零</button>
+							<button p-for="count count_a" onclick={handleButtonRemoveClick}>减少</button>
+							<button p-for="count count_a" onclick={handleButtonClearClick}>清零</button>
 							<form action="" p-bind="form">
-								<h1 p-bind="text" p-for="count_a"></h1>
-								<input p-for="text" p-bind="keyup" name="user" type="text" onkeyup={handleInputKeyUp} />
-								<h1 p-bind="select" p-for="keyup"></h1>
+								<h1 p-bind="text"></h1>
+								<input p-for="text" name="user" onkeyup={handleInputKeyUp} />
+								<h1 p-bind="select"></h1>
 								<select p-for="select" name="index" onchange={handleSelectChange}>
 									<option value="1">1</option>
 									<option value="2">2</option>
