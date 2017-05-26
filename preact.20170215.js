@@ -69,16 +69,7 @@
 	Array.prototype._eq = function(index) {
 		return index < 0 ? this[this.length + index] : this[index];
 	};
-	let watcher = function(elem, name, value) {
-			elem._bindElement && elem._bindElement.forEach((e) => {
-				if (Reflect.has(e.attributes, name)) e._attr(name, value);
-				else if (Reflect.has(e, name)) /input|select/.test(e.tagName.toLowerCase()) && typeof value == "string" ? e._val(value) : e[name] = value;
-				else {
-					e._text(value);
-				}
-			})
-		},
-		auxDiv = document.createElement('div'),
+	let auxDiv = document.createElement('div'),
 		transitionKey = auxDiv.style.webkitTransition !== undefined ? 'webkitTransition' : (
 			auxDiv.style.mozTransition !== undefined ? 'mozTransition' : (
 				auxDiv.style.msTransition !== undefined ? 'msTransition' : undefined
@@ -138,8 +129,7 @@
 					!mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
 						then.setAttribute(e.name, e.value);
 						then[e.name] = e.value;
-						watcher(then, e.name, e.value);
-					}) || !mod.is(typeof value, "undefined") && (then.setAttribute(name, value), (then[name] = value), watcher(then, name, value));
+					}) || !mod.is(typeof value, "undefined") && (then.setAttribute(name, value), (then[name] = value));
 				else {
 					return then.getAttribute(name);
 				}
@@ -165,7 +155,6 @@
 					if ((nodeType === 1 || nodeType === 9 || nodeType === 11) && typeof then.textContent === "string") {
 						if (typeof value != "undefined") {
 							then.textContent = value;
-							watcher(then, "textContent", value);
 							return this;
 						} else {
 							return then.textContent;
@@ -173,7 +162,6 @@
 					} else if (nodeType === 3 || nodeType === 4) {
 						if (typeof value != "undefined") {
 							then.nodeValue = value;
-							watcher(then, "nodeValue", value);
 							return this;
 						} else {
 							return then.nodeValue;
@@ -191,14 +179,12 @@
 					mod.toggle(then, (end) => {
 						if (typeof value == "string") {
 							then.innerHTML = value;
-							watcher(then, "innerHTML", value);
 						} else if (typeof value != "undefined" && value.nodeType) {
 							then._append(value);
 						} else if (typeof value == "function") {
 							then._html(value());
 						} else {
 							then.innerHTML = value;
-							watcher(then, "innerHTML", value);
 						}
 						end();
 					});
@@ -851,7 +837,7 @@
 			for (let name in handle) !/element/.test(name) && (mod.on(element, name, ((e) => {
 				if (mod.is(typeof handle[e.type], "string")) {
 					var fnName = handle[e.type].replace(/\s+/gim, "").replace("{", "").replace("}", "");
-					element._factory[fnName].call(element, e);
+					element._factory && element._factory[fnName] && element._factory[fnName].call(element, e);
 				} else {
 					handle[e.type].call(element, e);
 				}
