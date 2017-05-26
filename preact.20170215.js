@@ -137,8 +137,9 @@
 				if (typeof value != "undefined")
 					!mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
 						then.setAttribute(e.name, e.value);
+						then[e.name] = e.value;
 						watcher(then, e.name, e.value);
-					}) || !mod.is(typeof value, "undefined") && (then.setAttribute(name, value), watcher(then, name, value));
+					}) || !mod.is(typeof value, "undefined") && (then.setAttribute(name, value), (then[name] = value), watcher(then, name, value));
 				else {
 					return then.getAttribute(name);
 				}
@@ -613,7 +614,7 @@
 									}
 								})
 							}
-							["text", "nodeValue"].forEach((text) => {
+							["value", "nodeValue"].forEach((text) => {
 								e[text] && e[text].replace && (e[text] = e[text].replace(/\{+\s*[^<>}{,]+\s*\}+/gim, ((a) => {
 									for (let name in data) {
 										a = a.replace(new RegExp("{{\\s*" + name + "\\s*(\\|\\s*([^<>,]+)\\s*)*}}", "gim"), ((a, b, c) => {
@@ -1169,7 +1170,10 @@
 		},
 		createClass(name, classObject) {
 			Reflect.defineProperty(mod.Class, name.toLowerCase(), {
-				value: classObject
+				value: classObject,
+				enumerable: true,
+				writable: true,
+				configurable: true
 			});
 			return Reflect.get(mod.Class, name.toLowerCase());
 		},
@@ -1378,7 +1382,7 @@
 					switch (name) {
 						case "text":
 							v.forEach((sv) => {
-								if (mod.is(typeof sv, "string") && mod.is(element.nodeType, 3)) {
+								if (mod.is(typeof sv, "string") && (mod.is(element.nodeType, 3) || mod.is(element.nodeType, 1))) {
 									element._text(sv);
 								} else if (mod.is(typeof sv, "function")) {
 									sv = sv();
