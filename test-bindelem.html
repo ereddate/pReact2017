@@ -18,17 +18,6 @@
 	<body>
 		<div id="page"></div>
 		<script type="text/pReact">
-			let test = pReact.createClass("test", {
-				render(){
-					return pReact.createDom("a", {
-						text:"test"
-					}, pReact.createDom("img", {}))
-				}
-			});
-			pReact.renderDom(
-				<test />,
-				document.body
-			);
 			let bindElement = pReact.createClass("bindelement", {
 				handleButtonAddClick(e){
 					let that = this;
@@ -37,6 +26,7 @@
 						a+=1;
 						a = a>9 ? 9 : a;
 						elem._val(a);
+						/*elem._trigger("change")*/
 					})
 				},
 				handleButtonRemoveClick(e){
@@ -64,6 +54,7 @@
 					this._val(this.value);
 				},
 				handleInputChange(e){
+					/*this._bindElement[0]._html(this.value);*/
 				},
 				render(){
 					return (
