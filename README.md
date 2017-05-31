@@ -276,6 +276,9 @@ touch
 
 canvasDraw
   canvas绘图
+ 
+watch
+  监听标签属性或值的变化（查看test-bindelem.html）
   
 ```
 # Element对象私有方法，支持伪类选择器（例如："div:contents","div:parents","div:children","div:text"等等）。
@@ -431,7 +434,10 @@ _val(value)
 设置或获取节点的value属性值
 
 _bindElement
-双向绑定的节点
+绑定的节点集
+
+_watch
+监听标签的变化（查看test-bindelem.html）
 
 ```
 # 原型扩展
@@ -461,9 +467,9 @@ String.prototype._tmpl
 
 请参照test-flex.html使用
 ```
-# 双向绑定
+# 多向绑定
 ```
-支持节点间绑定，并赋给节点的 _bindElement (数组)。
+支持多节点间绑定，并赋给节点的 _bindElement (数组)。注：绑定节点不能互相绑定，如a 绑定 b, b 绑定 a。
 属性：
 p-bind 绑定名称
 p-for 连接绑定名称
@@ -484,4 +490,9 @@ render(){
     <button p-for="count count_a ..." onclick={handleButtonClearClick}>清零</button>
   ...
 }
+```
+# 增加节点事件
+```
+ondomcontentloaded 当新节点插入父节点后，触发此事件（查看test-bindelem.html）
+onwatching 当标签发生变化时，触发此事件
 ```
