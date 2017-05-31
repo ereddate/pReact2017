@@ -596,7 +596,7 @@
 										switch (name[0]) {
 											case "router":
 												let params = mod.jsonToUrlString(pReact._routes[a.value].params || {}, "&");
-												let val = pReact._routes[a.value].path + (params == "" ? "" : /\?/.test(pReact._routes[a.value].path) ? "?" : "&") + params;
+												let val = pReact._routes[a.value].path + (params == "" ? "" : !/\?/.test(pReact._routes[a.value].path) ? "?" : "&") + params;
 												e._attr(name[1], val);
 												break;
 											default:
