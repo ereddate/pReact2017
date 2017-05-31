@@ -516,6 +516,13 @@
 			}));
 			return content;
 		},
+		jsonToUrlString(obj, at){
+			let str =[];
+			pReact.each(obj, (name, val) => {
+				val != "" && str.push(name+"="+val.toString());
+			});
+			return str.length>0 ? str.join(at) : "";
+		},
 		tmpl(element, data, obj) {
 			let bindAttrElement = {
 				bind: {},
@@ -525,7 +532,7 @@
 					element && (Reflect.has(element, "length") ? Object.is(element.nodeType, 11) ? [...element.childNodes] : [...element] : [element]).forEach((e) => {
 						e["_factory"] = obj;
 						e["_data"] = data;
-						e._trigger("watching");
+						e._trigger && e._trigger("watching");
 						if (e.tagName && !Object.is(pReact.Class[e.tagName.toLowerCase()], undefined)) {
 							//console.log(e)
 							let parent = e.parentNode;
@@ -585,11 +592,21 @@
 									}
 									if (/^p-/.test(a.name.toLowerCase())) {
 										e._removeAttr(a.name)
-										let belem = bindAttrElement[a.name.toLowerCase().replace("p-", "") == "for" ? "bind" : "for"],
-											vname = a.value.split(' ');
-										vname.forEach((n) => {
-											!belem[n] ? belem[n] = [e] : belem[n].push(e);
-										})
+										let name = a.name.replace(/p\-/gim, "").split(':');
+										switch (name[0]) {
+											case "router":
+												let params = mod.jsonToUrlString(pReact._routes[a.value].params || {}, "&");
+												let val = pReact._routes[a.value].path + (params == "" ? "" : /\?/.test(pReact._routes[a.value].path) ? "?" : "&") + params;
+												e._attr(name[1], val);
+												break;
+											default:
+												let belem = bindAttrElement[a.name.toLowerCase().replace("p-", "") == "for" ? "bind" : "for"],
+													vname = a.value.split(' ');
+												vname.forEach((n) => {
+													!belem[n] ? belem[n] = [e] : belem[n].push(e);
+												})
+												break;
+										}
 									} else {
 										if (/data\-src/.test(a.name.toLowerCase()) || /data\-poster/.test(a.name.toLowerCase()))
 											(e.setAttribute(a.name.toLowerCase().replace("data-", ""), /\{+\s*([^<>}{,]+)\s*\}+/.test(a.value) ? (a.value = a.value.replace(/\{+\s*([^<>}{,]+)\s*\}+/gim, ((a, b) => {
@@ -680,7 +697,7 @@
 					val = newVal;
 					callback && callback.call(elem, key, val, newVal);
 				}
-			})
+			});
 		},
 		dir(elem, dir) {
 			var matched = [];
@@ -1118,6 +1135,10 @@
 		Styles: mod.Styles,
 		touchDirection: mod.touchDirection,
 		mixElement: mod.mixElement,
+		router(params) {
+			!pReact._routes && (pReact._routes = {});
+			return mod.extend(pReact._routes, params);
+		},
 		Callbacks() {
 			let args = arguments && [...arguments] || [],
 				len = args.length,
@@ -1211,9 +1232,9 @@
 						}
 					},
 					done = (result) => {
-						parent.addEventListener("DOMNodeInserted", function(e){
-							if (e.target.nodeType === 1){
-								e.target._trigger("domcontentloaded");
+						parent.addEventListener("DOMNodeInserted", function(e) {
+							if (e.target.nodeType === 1) {
+								e.target._trigger && e.target._trigger("domcontentloaded");
 							}
 						});
 						obj._data = result;
@@ -1546,7 +1567,7 @@ pReact && (((pReact) => {
 		}
 	}
 })(pReact), ((pReact) => {
-	let stringify = (obj) => {
+	let stringify = pReact.stringify = (obj) => {
 			if (null == obj)
 				return "null";
 			if ("string" != typeof obj && obj.toJSON)
