@@ -81,6 +81,10 @@
 			};
 		},
 		pSubClass = {
+			_watch(key, callback) {
+				mod.watch(this, key, this._val(), callback);
+				return this;
+			},
 			_set(options) {
 				var then = this;
 				mod.set(then, options);
@@ -129,7 +133,7 @@
 					!mod.is(typeof name, "string") && [].slice.call(name).forEach((e) => {
 						then.setAttribute(e.name, e.value);
 						then[e.name] = e.value;
-					}) || !mod.is(typeof value, "undefined") && (then.setAttribute(name, value), (then[name] = value));
+					}) || !mod.is(typeof value, "undefined") && ((then[name] = value), then.setAttribute(name, value));
 				else {
 					return then.getAttribute(name);
 				}
@@ -519,7 +523,9 @@
 			};
 			var f = (element) => {
 					element && (Reflect.has(element, "length") ? Object.is(element.nodeType, 11) ? [...element.childNodes] : [...element] : [element]).forEach((e) => {
-						//console.log(e)
+						e["_factory"] = obj;
+						e["_data"] = data;
+						e._trigger("watching");
 						if (e.tagName && !Object.is(pReact.Class[e.tagName.toLowerCase()], undefined)) {
 							//console.log(e)
 							let parent = e.parentNode;
@@ -561,8 +567,6 @@
 								parent
 							);
 						} else {
-							!e["_factory"] && (e["_factory"] = obj);
-							!e["_data"] && (e["_data"] = data);
 							var attrs = e.attributes && e.attributes.length > 0 && [...e.attributes] || false;
 							if (attrs) {
 								attrs.forEach((a) => {
@@ -659,12 +663,24 @@
 							let f = bindAttrElement.for[name];
 							pReact.each(f, (n, felem) => {
 								!elem._bindElement ? elem._bindElement = [felem] : elem._bindElement.push(felem);
-							})
+							});
 						}
 					})
 				}
 			}
 			return element;
+		},
+		watch(elem, key, val, callback) {
+			Reflect.defineProperty(elem, key, {
+				get: function() {
+					return val;
+				},
+				set: function(newVal) {
+					if (newVal == val) return;
+					val = newVal;
+					callback && callback.call(elem, key, val, newVal);
+				}
+			})
 		},
 		dir(elem, dir) {
 			var matched = [];
@@ -1093,6 +1109,7 @@
 			});
 			return promise;
 		},
+		watch: mod.watch,
 		trim: mod.trim,
 		map: mod.map,
 		isPlainObject: mod.isPlainObject,
@@ -1194,8 +1211,13 @@
 						}
 					},
 					done = (result) => {
+						parent.addEventListener("DOMNodeInserted", function(e){
+							if (e.target.nodeType === 1){
+								e.target._trigger("domcontentloaded");
+							}
+						});
 						obj._data = result;
-						obj.render && (element = pReact.tmpl(obj.render(), obj._data));
+						obj.render && (element = pReact.tmpl(obj.render(), obj._data, obj));
 						if (element) {
 							//console.log(element, parent)
 							if (mod.is(typeof element, "object") && "length" in element || mod.is(typeof element, "array")) {
