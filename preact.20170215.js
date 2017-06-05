@@ -516,12 +516,12 @@
 			}));
 			return content;
 		},
-		jsonToUrlString(obj, at){
-			let str =[];
+		jsonToUrlString(obj, at) {
+			let str = [];
 			pReact.each(obj, (name, val) => {
-				val != "" && str.push(name+"="+val.toString());
+				val != "" && str.push(name + "=" + val.toString());
 			});
-			return str.length>0 ? str.join(at) : "";
+			return str.length > 0 ? str.join(at) : "";
 		},
 		tmpl(element, data, obj) {
 			let bindAttrElement = {
@@ -1223,11 +1223,9 @@
 							element = mod.tmpl(element, data, obj);
 							temp.innerHTML = element;
 							fragment = mod.translateFragment(temp, fragment, obj, data);
-							//parent.innerHTML = "";
 							parent.appendChild(fragment);
 						} else {
 							element = mod.tmpl(element, data, obj);
-							//parent.innerHTML = "";
 							parent.appendChild(element);
 						}
 					},
@@ -1240,7 +1238,6 @@
 						obj._data = result;
 						obj.render && (element = pReact.tmpl(obj.render(), obj._data, obj));
 						if (element) {
-							//console.log(element, parent)
 							if (mod.is(typeof element, "object") && "length" in element || mod.is(typeof element, "array")) {
 								element.forEach((e) => {
 									toElements(e);
@@ -1340,9 +1337,10 @@
 					if (d = b.call(a[e], e, a[e]), d === !1) break;
 			return a
 		},
+		_renderPage: true,
 		renderPage() {
 			let then = this;
-			pReact.loading();
+			//pReact.loading();
 			var script = doc.getElementsByTagName("script");
 			(mod.extend([], [...script])).forEach((e) => {
 				if (mod.is(e.type, "text/pReact")) {
@@ -1350,7 +1348,7 @@
 					e.parentNode.removeChild(e);
 				}
 			});
-			pReact.loaded();
+			//pReact.loaded();
 			return then;
 		},
 		ready(loading) {
@@ -1360,7 +1358,7 @@
 					win.removeEventListener("load", completed);
 					loading && loading();
 					then.toMobile(16);
-					then.renderPage();
+					then._renderPage && then.renderPage();
 				};
 			doc.addEventListener("DOMContentLoaded", completed);
 			win.addEventListener("load", completed);
@@ -1407,7 +1405,6 @@
 				for (let name in attrs) {
 					var n = attrs[name],
 						v = f(n);
-					//console.log(v, name)
 					switch (name) {
 						case "text":
 							v.forEach((sv) => {
@@ -2312,4 +2309,57 @@ pReact && (((pReact) => {
 			return this;
 		}
 	};
+})(pReact), ((pReact) => {
+	function load(name, callback) {
+		pReact.get(this._configs.base + this._configs.modules[name], {}, function(a, b, c) {
+			if (a == "success") {
+				let script = pReact.createDom("script", {
+					type: "text/pReact",
+					style: "display:none",
+					text: b
+				});
+				pReact.findNode("body")[0]._append(script);
+				pReact.renderPage();
+				callback && callback(b);
+			}
+		}, function(a, b, c) {
+			console.log(a);
+			console.log(b)
+		}, "text");
+	}
+	pReact.extend(pReact, {
+		config(ops) {
+			!this._configs && (this._configs = {
+				base: "",
+				modules: {}
+			});
+			ops.base && (this._configs.base = ops.base);
+			ops.modules && this.extend(this._configs.modules, ops.modules);
+			return this;
+		},
+		require( /*name, depend, callback*/ ) {
+			let that = this,
+				args = arguments,
+				len = args.length;
+			switch (len) {
+				case 2:
+					load.call(that, args[0], args[1]);
+					break;
+				case 3:
+					let a = pReact.Callbacks();
+					pReact.each(args[1], (n, e) => {
+						a.add((done) => {
+							load.call(that, e, function() {
+								done()
+							});
+						})
+					});
+					a.done(() => {
+						load.call(that, args[0], args[2]);
+					});
+					break;
+			}
+			return this;
+		}
+	})
 })(pReact));
