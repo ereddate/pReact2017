@@ -496,3 +496,9 @@ render(){
 ondomcontentloaded 当新节点插入父节点后，触发此事件（查看test-bindelem.html）
 onwatching 当标签发生变化时，触发此事件
 ```
+# pjs的模块化(test-require.html)
+```
+pReact.config 模块配置方法，提供两个参数base基础地址、modules模块匿名及其值。
+pReact.require 模块的加载(ajax)，支持依赖加载。
+
+```
