@@ -2310,22 +2310,47 @@ pReact && (((pReact) => {
 		}
 	};
 })(pReact), ((pReact) => {
+	let load_status = {
+		loading: 0,
+		loaded: 1,
+		error: 2
+	};
+
+	function activeTmpl(b) {
+		let script = pReact.createDom("script", {
+			type: "text/pReact",
+			style: "display:none",
+			text: b
+		});
+		pReact.findNode("body")[0]._append(script);
+		pReact.renderPage();
+	}
+
 	function load(name, callback) {
-		pReact.get(this._configs.base + this._configs.modules[name], {}, function(a, b, c) {
-			if (a == "success") {
-				let script = pReact.createDom("script", {
-					type: "text/pReact",
-					style: "display:none",
-					text: b
-				});
-				pReact.findNode("body")[0]._append(script);
-				pReact.renderPage();
-				callback && callback(b);
-			}
-		}, function(a, b, c) {
-			console.log(a);
-			console.log(b)
-		}, "text");
+		let that = this;
+		if (!that._configs.modules[name].status || that._configs.modules[name].status != 1){
+			pReact.get(that._configs.base + (that._configs.modules[name].status ? that._configs.modules[name].path : that._configs.modules[name]), {}, function(a, b, c) {
+				if (a == "success") {
+					activeTmpl(b);
+					that._configs.modules[name] = {
+						path: that._configs.modules[name],
+						contents: b,
+						status: load_status.loaded
+					};
+					callback && callback(b);
+				}
+			}, function(a, b, c) {
+				that._configs.modules[name] = {
+					path: that._configs.modules[name],
+					contents: null,
+					status: load_status.error
+				};
+				console.log(a);
+				console.log(b)
+			}, "text");
+		}else if (that._configs.modules[name].status === 1){
+			callback && callback(that._configs.modules[name].contents);
+		}
 	}
 	pReact.extend(pReact, {
 		config(ops) {
