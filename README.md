@@ -1,12 +1,24 @@
 # pReact2017
 ereddate/pReact的另一个版本，写法有些类似react、jQuery。
+
 QQ讨论群:9786575
 
-模板数据的过滤方式及过滤功能与ereddate/pReact相同，如：{{dataname | lowercase}}。
 # 引用
 ```
 <script src="preact.20170215.js"></script>
 ```
+
+# 主要方法
+```
+createStyle 创建样式
+createClass 创建类
+createDom   创建标签
+renderDom   渲染DOM
+renderPage  渲染页面
+```
+
+模板数据的过滤方式及过滤功能与ereddate/pReact相同，如：{{dataname | lowercase}}。
+
 # 模板写法：
 ```
 <script type="text/pReact">
