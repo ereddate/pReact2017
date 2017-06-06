@@ -14,7 +14,31 @@ createStyle 创建样式
 createClass 创建类
 createDom   创建标签
 renderDom   渲染DOM
-renderPage  渲染页面
+
+例如：
+var a = pReact.createStyle({
+  loading:{
+    background:"rgb(255,255,255)",
+  }
+});
+var b = pReact.createClass("classname", {
+  render(){
+    return pReact.createDom("img", {
+      src: "imgurl",
+      alt: "altTitle",
+      title: "titleText",
+      style: a.loading
+    });
+  }
+});
+pReact.renderDom(
+  "classname",
+  {},
+  document.getElementById("dome"),
+  (() => {
+    console.log("渲染后的回调函数");
+  })
+);
 ```
 
 模板数据的过滤方式及过滤功能与ereddate/pReact相同，如：{{dataname | lowercase}}。
