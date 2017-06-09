@@ -16,27 +16,9 @@
 		</style>
 	</head>
 	<body>
-		<div p-template="test">
-			<a p-router:href="/test" target="_blank" p-handle:click="handleClickFn">{{title}}</a><br />
-			<input type="text" value="{{title}}" p-handle:change="handleChangeFn" />
-		</div>
 		<div id="page"></div>
 		<script>
 			pReact._renderPage=false;
-			pReact.renderTemplate("test", {
-				title: "test",
-				handle: {
-					handleClickFn(e) {
-						e.preventDefault();
-						console.log(e);
-					},
-					handleChangeFn(e){
-						this._data.title=this.value
-					}
-				}
-			}, function(elem) {
-				console.log(elem)
-			});
 			pReact.config({
 				base: "http://192.168.10.47/m/preact/preact2017/",
 				modules:{
@@ -69,7 +51,6 @@
 					})
 				)
 			});
-
 			/*pReact.require("modtest1", function(){
 				pReact.renderDom(
 					"test1",
