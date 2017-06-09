@@ -75,6 +75,7 @@
 				auxDiv.style.msTransition !== undefined ? 'msTransition' : undefined
 			)
 		),
+		hasOwn = {}.hasOwnProperty,
 		_instanceOf = (_constructor) => {
 			return function(o) {
 				return (o instanceof _constructor);
@@ -179,7 +180,7 @@
 			},
 			_html(value) {
 				let then = this;
-				if (typeof value != "boolean") {
+				if (typeof value != "undefined" && typeof value != "boolean") {
 					mod.toggle(then, (end) => {
 						if (typeof value == "string") {
 							then.innerHTML = value;
@@ -573,7 +574,7 @@
 								options,
 								parent
 							);
-						} else {
+						} else if (e.nodeType) {
 							var attrs = e.attributes && e.attributes.length > 0 && [...e.attributes] || false;
 							if (attrs) {
 								attrs.forEach((a) => {
@@ -591,13 +592,22 @@
 										}
 									}
 									if (/^p-/.test(a.name.toLowerCase())) {
-										e._removeAttr(a.name)
 										let name = a.name.replace(/p\-/gim, "").split(':');
 										switch (name[0]) {
 											case "router":
-												let params = mod.jsonToUrlString(pReact._routes[a.value].params || {}, "&");
-												let val = pReact._routes[a.value].path + (params == "" ? "" : !/\?/.test(pReact._routes[a.value].path) ? "?" : "&") + params;
-												e._attr(name[1], val);
+												if (pReact._routes && pReact._routes[a.value]) {
+													let result = pReact._routes[a.value];
+													if (Object.is(typeof result, "function")) {
+														result = result();
+													}
+													let params = mod.jsonToUrlString(result.params || {}, "&"),
+														val = result.path + (params == "" ? "" : !/\?/.test(result.path) ? "?" : "&") + params;
+													e._attr(name[1], val);
+													e._removeAttr(a.name)
+												}
+												break;
+											case "handle":
+												data.handle && (e._on(name[1], data.handle[a.value]), e._removeAttr(a.name));
 												break;
 											default:
 												let belem = bindAttrElement[a.name.toLowerCase().replace("p-", "") == "for" ? "bind" : "for"],
@@ -605,6 +615,7 @@
 												vname.forEach((n) => {
 													!belem[n] ? belem[n] = [e] : belem[n].push(e);
 												})
+												e._removeAttr(a.name)
 												break;
 										}
 									} else {
@@ -688,16 +699,7 @@
 			return element;
 		},
 		watch(elem, key, val, callback) {
-			Reflect.defineProperty(elem, key, {
-				get: function() {
-					return val;
-				},
-				set: function(newVal) {
-					if (newVal == val) return;
-					val = newVal;
-					callback && callback.call(elem, key, val, newVal);
-				}
-			});
+			_createObject(elem, key, val, callback);
 		},
 		dir(elem, dir) {
 			var matched = [];
@@ -835,6 +837,9 @@
 				if (children) {
 					return [...children];
 				}
+			} else if (/template\:/.test(selector)) {
+				let nodes = document.querySelectorAll("[p-" + selector.replace(":", "=") + "]");
+				return [...nodes];
 			} else if (/\[[^\[\]]+\]/.test(selector)) {
 				let reg = /([^\[\]]+)\s*\[([^\[\]]+)\]/.exec(selector);
 				if (reg) {
@@ -1044,6 +1049,7 @@
 			});
 		},
 		Class: {},
+		templates: {},
 		Styles: {
 			flexrow: "display: flex; flex-flow: row; justify-content: space-between; ",
 			flexcolumn: "display: flex; flex-flow: column; justify-content: space-between; ",
@@ -1078,7 +1084,21 @@
 			return frags;
 		},
 		isPlainObject(obj) {
-			return "Object" == null != obj && null != obj.constructor ? Object.prototype.toString.call(obj).slice(8, -1) : ""
+			var key;
+			if (!obj || typeof obj !== "object" || obj.nodeType) {
+				return false;
+			}
+			try {
+				if (obj.constructor &&
+					!hasOwn.call(obj, "constructor") &&
+					!hasOwn.call(obj.constructor.prototype, "isPrototypeOf")) {
+					return false;
+				}
+			} catch (e) {
+				return false;
+			}
+			for (key in obj) {}
+			return key === undefined || hasOwn.call(obj, key);
 		},
 		isEmptyObject(obj) {
 			var name;
@@ -1092,6 +1112,41 @@
 
 	String.prototype._tmpl = function(data) {
 		return mod.tmpl(this, data);
+	};
+
+	function _createObject(obj, name, _class, callback) {
+		Reflect.defineProperty(obj, name, {
+			get: function() {
+				return _class
+			},
+			set: function(newClassObject) {
+				if (_class == newClassObject) return;
+				let oldClass = _class;
+				_class = newClassObject;
+				//console.log(_class);
+				callback && callback.call(obj, name, _class, oldClass);
+			}
+		});
+	}
+
+	function _each(a, b, c) {
+		var d, e = 0,
+			f = a.length,
+			g = pReact.is("array", a);
+		if (c) {
+			if (g) {
+				for (; f > e; e++)
+					if (d = b.apply(a[e], c), d === !1) break
+			} else
+				for (let e in a)
+					if (d = b.apply(a[e], c), d === !1) break
+		} else if (g) {
+			for (; f > e; e++)
+				if (d = b.call(a[e], e, a[e]), d === !1) break
+		} else
+			for (let e in a)
+				if (d = b.call(a[e], e, a[e]), d === !1) break;
+		return a
 	};
 
 	pReact.extend = mod.extend;
@@ -1129,6 +1184,9 @@
 		watch: mod.watch,
 		trim: mod.trim,
 		map: mod.map,
+		getTemplates(name) {
+			return typeof name == "string" ? mod.templates[name] : mod.templates;
+		},
 		isPlainObject: mod.isPlainObject,
 		isEmptyObject: mod.isEmptyObject,
 		Class: mod.Class,
@@ -1212,7 +1270,41 @@
 			}
 			return mod.extend(mod.Styles, style);
 		},
+		renderTemplate(name, data, callback) {
+			let that = this,
+				parent = pReact.findNode("template:" + name);
+			if (!parent || parent.length === 0) {
+				parent = mod.templates[name] && [mod.templates[name].parent] || [];
+			}
+			if (parent && parent.length > 0) {
+				!mod.templates[name] && (mod.templates[name] = {
+					parent: parent[0],
+					content: parent[0]._html(),
+					data: data
+				}, _each(mod.templates[name].data, function(n, val) {
+					_createObject(mod.templates[name].data, n, val, function(a, b) {
+						that.renderTemplate(name, data, callback);
+					})
+				}));
+				pReact.createClass(name, {
+					render() {
+						return mod.tmpl(mod.templates[name].content, mod.templates[name].data || {});
+					}
+				});
+				parent[0]._html('');
+				pReact.renderDom(
+					name, (data || {}),
+					parent[0],
+					((elem) => {
+						mod.tmpl(elem, data || {})
+							//mod.templates[name].data.title = "e"
+					})
+				);
+			}
+			return this;
+		},
 		renderDom(name, data, parent, callback) {
+			let that = this;
 			if (!Object.is(parent, null)) {
 				let obj = (mod.is(typeof name, "string") ? Reflect.get(mod.Class, name.toLowerCase()) : name),
 					element,
@@ -1237,6 +1329,7 @@
 						});
 						obj._data = result;
 						obj.render && (element = pReact.tmpl(obj.render(), obj._data, obj));
+						_createObject(obj, "_data", result);
 						if (element) {
 							if (mod.is(typeof element, "object") && "length" in element || mod.is(typeof element, "array")) {
 								element.forEach((e) => {
@@ -1248,21 +1341,22 @@
 							parent.className = parent.className.replace(/\s*preactroot/gim, "");
 							parent.className += " preactroot";
 						}
-						callback && callback();
+						callback && callback(parent);
 					};
-				mod.is(obj._data, undefined) && (obj._data = {});
-				(!mod.is(data, undefined) || mod.isPlainObject(data)) && mod.extend(obj._data, data);
-				("getInitData" in obj) && (new Promise((resolve, reject) => {
-					obj.getInitData(resolve, reject)
-				}).then((result) => {
-					("length" in result) && /object|array/.test(typeof result) ? mod.extend(obj._data, {
-						data: result
-					}) : mod.extend(obj._data, result);
-					done(obj._data);
-				}, (e) => {
-					console.log(e);
-					done({});
-				})) || done(data);
+				if (obj) {
+					mod.is(obj._data, undefined) && (obj._data = {});
+					(!mod.is(data, undefined) || mod.isPlainObject(data)) && mod.extend(obj._data, data);
+					("getInitData" in obj) && (new Promise((resolve, reject) => {
+						obj.getInitData(resolve, reject)
+					}).then((result) => {
+						done(("length" in result) && /object|array/.test(typeof result) ? mod.extend(obj._data, {
+							data: result
+						}) : mod.extend(obj._data, result));
+					}, (e) => {
+						console.log(e);
+						done({});
+					})) || done(data);
+				}
 			}
 			return this;
 		},
@@ -1319,23 +1413,7 @@
 			return this;
 		},
 		each(a, b, c) {
-			var d, e = 0,
-				f = a.length,
-				g = pReact.is("array", a);
-			if (c) {
-				if (g) {
-					for (; f > e; e++)
-						if (d = b.apply(a[e], c), d === !1) break
-				} else
-					for (let e in a)
-						if (d = b.apply(a[e], c), d === !1) break
-			} else if (g) {
-				for (; f > e; e++)
-					if (d = b.call(a[e], e, a[e]), d === !1) break
-			} else
-				for (let e in a)
-					if (d = b.call(a[e], e, a[e]), d === !1) break;
-			return a
+			return _each(a, b, c);
 		},
 		_renderPage: true,
 		renderPage() {
@@ -2328,7 +2406,7 @@ pReact && (((pReact) => {
 
 	function load(name, callback) {
 		let that = this;
-		if (!that._configs.modules[name].status || that._configs.modules[name].status != 1){
+		if (!that._configs.modules[name].status || that._configs.modules[name].status != 1) {
 			pReact.get(that._configs.base + (that._configs.modules[name].status ? that._configs.modules[name].path : that._configs.modules[name]), {}, function(a, b, c) {
 				if (a == "success") {
 					activeTmpl(b);
@@ -2348,7 +2426,7 @@ pReact && (((pReact) => {
 				console.log(a);
 				console.log(b)
 			}, "text");
-		}else if (that._configs.modules[name].status === 1){
+		} else if (that._configs.modules[name].status === 1) {
 			callback && callback(that._configs.modules[name].contents);
 		}
 	}
